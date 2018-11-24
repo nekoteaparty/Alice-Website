@@ -1,0 +1,232 @@
+<template>
+  <div>
+    <el-button type="primary" size="medium" icon="el-icon-plus" @click="createTask" :loading="loading">手动推流</el-button>
+    <hr/>
+    <PagedTable :tableData="tableData" :tableHeader="tableHeader" :loading="loading">
+      <el-table-column label="操作" width="200px">
+        <template slot-scope="scope">
+            <el-button size="mini" @click="showDetail(scope.$index, scope.row)">详情</el-button>
+            <el-button size="mini" style="margin-left: 0px;" type="primary" @click="editVisible = true, editItem = scope.row">管理</el-button>
+            <el-button size="mini" style="margin-left: 0px;" type="success" @click="adoptTask(scope.row.videoId)" v-if="!!!scope.row.roomId">认领</el-button>
+            <el-popover placement="bottom" width="200" :ref="`popover-${scope.$index}`">
+              <p><i class="el-icon-warning"></i> 终止后系统将不会重新推流, 是否继续?</p>
+              <div style="text-align: right; margin-top:8px;">
+                <el-button type="primary" size="mini" @click="stopTask(scope.$index, scope.row)">继续</el-button>
+              </div>
+              <el-button slot="reference" size="mini" type="danger" v-if="!!scope.row.roomId">终止</el-button>
+            </el-popover>
+        </template>
+      </el-table-column>
+    </PagedTable>
+    <el-dialog title="推流详情" :visible.sync="detailVisible" width="40%">
+      <el-form label-position="left" :model="detailItem" disabled>
+        <el-form-item v-for="item in tableHeader" :label="item.label" :key="item.prop" label-width="80px">
+          <el-input v-model="detailItem[`${item.prop}`]" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="节目编号" label-width="80px">
+          <el-input v-model="detailItem.videoId" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="媒体地址" label-width="80px">
+          <a :href="detailItem.mediaUrl" target="_black">{{detailItem.mediaUrl}}</a>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" size="medium" @click="detailVisible = false">确 定</el-button>
+      </span>
+    </el-dialog>
+    <el-dialog title="推流管理" :visible.sync="editVisible" width="450px">
+      <el-form label-position="right" :model="editItem">
+        <el-form-item label="直播分区" label-width="100px">
+          <area-selector v-model="editItem.area" :value="editItem.area"></area-selector>
+        </el-form-item>
+        <el-form-item label="自主规制" label-width="100px">
+          <el-checkbox v-model="editItem.videoBanned">全屏马赛克</el-checkbox>
+          <el-checkbox v-model="editItem.audioBanned">强制单声道</el-checkbox>
+        </el-form-item>
+        <el-tag type="info" disable-transitions color="#fff" style="border:none" class="el-icon-info"> 修改推流信息将会导致推流短时间的中断</el-tag>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" size="medium" @click="editTask(), editVisible = false">修 改</el-button>
+      </span>
+    </el-dialog>
+  </div>
+</template>
+
+<style>
+.el-icon-warning {
+  color: #e6a23c;
+}
+
+.el-input.is-disabled .el-input__inner,
+.el-textarea.is-disabled .el-textarea__inner {
+  background-color: #fff;
+  border-color: #dcdfe6;
+  color: #606266;
+  cursor: default;
+}
+</style>
+
+
+<script>
+import PagedTable from "./PagedTable.vue";
+import AreaSelector from "./AreaSelector.vue";
+export default {
+  data() {
+    return {
+      tableData: [],
+      tableHeader: [
+        { prop: "nickname", label: "推流账号" },
+        { prop: "roomId", label: "直播间ID" },
+        { prop: "accountSite", label: "推流平台" },
+        { prop: "channelName", label: "节目频道" },
+        { prop: "videoTitle", label: "节目标题", width: "460px" }
+      ],
+      loading: false,
+      detailVisible: false,
+      detailItem: {},
+      editVisible: false,
+      editItem: {}
+    };
+  },
+  methods: {
+    taskList() {
+      this.loading = true;
+      this.$http.get("/api/broadcast/taskList.json").then(
+        function(response) {
+          // 这里是处理正确的回调
+          if (response.data.code === 0) {
+            this.tableData = [];
+            this.tableData = response.data.data;
+          } else {
+            this.$message.error(response.data.message);
+          }
+          this.loading = false;
+        },
+        function(response) {
+          if (response.status === 401) {
+            this.$router.push({ path: "/login" });
+          }
+          this.$message.error("请求失败");
+          this.loading = false;
+        }
+      );
+    },
+    editTask() {
+      let apiUrl = "/api/broadcast/editTask.json";
+      this.$http.post(apiUrl, this.editItem).then(
+        function(response) {
+          // 这里是处理正确的回调
+          if (response.data.code === 0) {
+            this.$message({
+              message: "推流任务修改成功",
+              type: "success"
+            });
+            this.taskList();
+          } else {
+            this.$message.error(response.data.message);
+          }
+        },
+        function(response) {
+          if (response.status === 401) {
+            this.$router.push({ path: "/login" });
+          }
+          this.$message.error("请求失败");
+        }
+      );
+    },
+    stopTask(index, row) {
+      let apiUrl = "/api/broadcast/stopTask.json?videoId=" + row.videoId;
+      this.$http.get(apiUrl).then(
+        function(response) {
+          // 这里是处理正确的回调
+          if (response.data.code === 0) {
+            if (this.$refs["popover-" + index]) {
+              this.$refs["popover-" + index].doClose();
+            }
+            this.$message({
+              message: "推流任务已停止",
+              type: "success"
+            });
+            this.taskList();
+          } else {
+            this.$message.error(response.data.message);
+          }
+        },
+        function(response) {
+          if (response.status === 401) {
+            this.$router.push({ path: "/login" });
+          }
+          this.$message.error("请求失败");
+        }
+      );
+    },
+    showDetail(index, row) {
+      this.detailVisible = true;
+      this.detailItem = row;
+    },
+    adoptTask(videoId){
+      this.$http.get("/api/broadcast/adoptTask.json?videoId=" + videoId).then(
+        function(response) {
+          // 这里是处理正确的回调
+          if (response.data.code === 0) {
+            this.$message({
+              message: "推流任务认领成功~",
+              type: "success"
+            });
+            this.taskList();
+          } else {
+            this.$message.error(response.data.message);
+          }
+        },
+        function(response) {
+          if (response.status === 401) {
+            this.$router.push({ path: "/login" });
+          }
+          this.$message.error("请求失败");
+        }
+      );
+    },
+    createTask() {
+      this.$prompt(
+        "请输入需要推流的媒体地址\n例:https://www.youtube.com/watch?v=KufDfy90fDo",
+        "手动推流",
+        {
+          inputPattern: /.+/,
+          inputErrorMessage: "请输入需要推流的媒体地址",
+          confirmButtonText: "确定",
+          cancelButtonText: "取消"
+        }
+      ).then(({ value }) => {
+        this.loading = true;
+        let apiUrl = "/api/broadcast/createTask.json?videoUrl=" + value;
+        this.$http.get(apiUrl).then(
+          function(response) {
+            // 这里是处理正确的回调
+            if (response.data.code === 0) {
+              this.$message({
+                message: "推流任务创建成功",
+                type: "success"
+              });
+              this.taskList();
+            } else {
+              this.$message.error(response.data.message);
+              this.loading = false;
+            }
+          },
+          function(response) {
+            if (response.status === 401) {
+              this.$router.push({ path: "/login" });
+            }
+            this.$message.error("请求失败");
+            this.loading = false;
+          }
+        );
+      });
+    }
+  },
+  components: { PagedTable, AreaSelector },
+  created() {
+    this.taskList();
+  }
+};
+</script>
