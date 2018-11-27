@@ -39,6 +39,7 @@ jobs:
           name: "Publish Release on GitHub"
           command: |
             sudo apt-get install golang
+            export GOPATH=~/repo
             sudo go get github.com/tcnksm/ghr
             sudo ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete "Last Release" alice-website.zip
 
