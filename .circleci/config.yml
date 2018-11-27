@@ -39,8 +39,8 @@ jobs:
           name: "Publish Release on GitHub"
           command: |
             sudo apt-get -y install software-properties-common
-            sudo add-apt-repository ppa:gophers/archive
-            echo | sudo apt-get -y update
+            echo | sudo add-apt-repository ppa:gophers/archive
+            sudo apt-get -y update
             sudo apt-get -y install golang-go
             export GOPATH=~/repo
             go get github.com/tcnksm/ghr
