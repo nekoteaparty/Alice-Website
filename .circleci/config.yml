@@ -38,10 +38,10 @@ jobs:
       - run:
           name: "Publish Release on GitHub"
           command: |
-            sudo apt-get install software-properties-common
+            sudo apt-get -y install software-properties-common
             sudo add-apt-repository ppa:longsleep/golang-backports
-            sudo apt-get update
-            sudo apt-get install golang-go
+            sudo apt-get -y update
+            sudo apt-get -y install golang-go
             export GOPATH=~/repo
             go get github.com/tcnksm/ghr
             ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete "Last Release" alice-website.zip
