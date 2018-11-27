@@ -27,8 +27,13 @@ jobs:
           - v1-dependencies-
 
       - run: 
-          - yarn install
-          - npm run build
+        command: |
+          yarn install
+          npm run build
+          zip -r -b ./dist alice-website.zip *
+
+      - store_artifacts:
+          path: alice-website.zip
 
       - save_cache:
           paths:
