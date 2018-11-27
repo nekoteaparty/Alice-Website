@@ -12,6 +12,9 @@
         <el-form-item label="B站关键字黑名单">
             <el-input v-model="setting.bannedKeywords"></el-input>
         </el-form-item>
+        <el-form-item label="默认转播分辨率">
+            <el-input v-model="setting.defaultResolution"></el-input>
+        </el-form-item>
         <el-button type="primary" @click="saveSetting()">保存</el-button>
     </el-form>
 </template>
