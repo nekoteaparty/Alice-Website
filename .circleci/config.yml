@@ -30,7 +30,7 @@ jobs:
           command: |
             yarn install
             npm run build
-            zip -r -b ./dist alice-website.zip *
+            zip -r alice-website.zip ./dist/*
 
       - store_artifacts:
           path: alice-website.zip
