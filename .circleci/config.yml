@@ -42,12 +42,13 @@ jobs:
   publish-github-release:
     docker:
       - image: cibuilds/github:0.10
-    working_directory: ~/repo
     steps:
+      - attach_workspace:
+          at: ./artifacts
       - run:
           name: "Publish Release on GitHub"
           command:
-            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete "Last Release" alice-website.zip
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete "Last Release" ./artifacts/
 workflows:
   version: 2
   main:
