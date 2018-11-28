@@ -8,7 +8,7 @@ jobs:
     docker:
       # specify the version you desire here
       - image: circleci/node:7.10
-      
+
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
       # documented at https://circleci.com/docs/2.0/circleci-images/
@@ -34,9 +34,33 @@ jobs:
 
       - store_artifacts:
           path: alice-website.zip
+          
+      - persist_to_workspace:
+          root: ./
+          paths: 
+            - alice-website.zip
 
       - save_cache:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
-
+          
+  publish-github-release:
+    docker:
+      - image: cibuilds/github:0.10
+    steps:
+      - attach_workspace:
+          at: ./
+      - run:
+          name: "Publish Release on GitHub"
+          command: |
+            ls -l
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete Last-Release alice-website.zip
+workflows:
+  version: 2
+  main:
+    jobs:
+      - build
+      - publish-github-release:
+          requires:
+            - build
