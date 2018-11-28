@@ -39,12 +39,17 @@ jobs:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
+    
+    persist_to_workspace:
+      root: ./
+      paths: 
+        - alice-website.zip
   publish-github-release:
     docker:
       - image: cibuilds/github:0.10
     steps:
       - attach_workspace:
-          at: /home/circleci/repo/
+          at: ./
       - run:
           name: "Publish Release on GitHub"
           command: |
