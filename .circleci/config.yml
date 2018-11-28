@@ -4,39 +4,55 @@
 #
 version: 2
 jobs:
-  build:
-    docker:
-      # specify the version you desire here
-      - image: circleci/node:7.10
-      
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/mongo:3.4.4
+  - build:
+      docker:
+        # specify the version you desire here
+        - image: circleci/node:7.10
 
-    working_directory: ~/repo
+        # Specify service dependencies here if necessary
+        # CircleCI maintains a library of pre-built images
+        # documented at https://circleci.com/docs/2.0/circleci-images/
+        # - image: circleci/mongo:3.4.4
 
-    steps:
-      - checkout
+      working_directory: ~/repo
 
-      # Download and cache dependencies
-      - restore_cache:
-          keys:
-          - v1-dependencies-{{ checksum "package.json" }}
-          # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
+      steps:
+        - checkout
 
-      - run: 
-          command: |
-            yarn install
-            npm run build
-            zip -r alice-website.zip ./dist/*
+        # Download and cache dependencies
+        - restore_cache:
+            keys:
+            - v1-dependencies-{{ checksum "package.json" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
 
-      - store_artifacts:
-          path: alice-website.zip
+        - run: 
+            command: |
+              yarn install
+              npm run build
+              zip -r alice-website.zip ./dist/*
 
-      - save_cache:
-          paths:
-            - node_modules
-          key: v1-dependencies-{{ checksum "package.json" }}
+        - store_artifacts:
+            path: alice-website.zip
+
+        - save_cache:
+            paths:
+              - node_modules
+            key: v1-dependencies-{{ checksum "package.json" }}
+  - publish-github-release:
+      requires:
+        - build
+      filters:
+        branches:
+          ignore: /.*/
+      docker:
+        - image: cibuilds/github:0.10
+      steps:
+        - attach_workspace:
+            at: ./artifacts
+        - run:
+            name: "Publish Release on GitHub"
+            command: |
+              VERSION=Last Release
+              ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./artifacts/
 
