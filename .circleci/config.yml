@@ -55,7 +55,7 @@ jobs:
           name: "Publish Release on GitHub"
           command: |
             ls -l
-            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete "Last Release" alice-website.zip
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete Last-Release alice-website.zip
 workflows:
   version: 2
   main:
