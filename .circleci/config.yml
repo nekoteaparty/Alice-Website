@@ -36,7 +36,7 @@ jobs:
           path: alice-website.zip
           
       - persist_to_workspace:
-          root: /artifacts
+          root: ./
           paths: 
             - alice-website.zip
 
@@ -50,7 +50,7 @@ jobs:
       - image: cibuilds/github:0.10
     steps:
       - attach_workspace:
-          at: /artifacts
+          at: /home/circleci/repo/
       - run:
           name: "Publish Release on GitHub"
           command: |
