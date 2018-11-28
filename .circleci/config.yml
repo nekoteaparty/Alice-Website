@@ -16,11 +16,6 @@ jobs:
 
     working_directory: ~/repo
 
-    persist_to_workspace:
-      root:  /artifacts
-      paths: 
-        - alice-website.zip
-
     steps:
       - checkout
 
@@ -39,6 +34,11 @@ jobs:
 
       - store_artifacts:
           path: alice-website.zip
+          
+      - persist_to_workspace:
+          root: /artifacts
+          paths: 
+            - alice-website.zip
 
       - save_cache:
           paths:
