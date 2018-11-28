@@ -44,11 +44,12 @@ jobs:
       - image: cibuilds/github:0.10
     steps:
       - attach_workspace:
-          at: ./artifacts
+          at: /home/circleci/repo/
       - run:
           name: "Publish Release on GitHub"
-          command:
-            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete "Last Release" ./artifacts/
+          command: |
+            ls -l
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete "Last Release" alice-website.zip
 workflows:
   version: 2
   main:
