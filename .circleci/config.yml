@@ -2,57 +2,59 @@
 #
 # Check https://circleci.com/docs/2.0/language-javascript/ for more details
 #
-version: 2
-jobs:
-  - build:
-      docker:
-        # specify the version you desire here
-        - image: circleci/node:7.10
+workflows:
+  version: 2
+  main:
+    jobs:
+      - build:
+          docker:
+            # specify the version you desire here
+            - image: circleci/node:7.10
 
-        # Specify service dependencies here if necessary
-        # CircleCI maintains a library of pre-built images
-        # documented at https://circleci.com/docs/2.0/circleci-images/
-        # - image: circleci/mongo:3.4.4
+            # Specify service dependencies here if necessary
+            # CircleCI maintains a library of pre-built images
+            # documented at https://circleci.com/docs/2.0/circleci-images/
+            # - image: circleci/mongo:3.4.4
 
-      working_directory: ~/repo
+          working_directory: ~/repo
 
-      steps:
-        - checkout
+          steps:
+            - checkout
 
-        # Download and cache dependencies
-        - restore_cache:
-            keys:
-            - v1-dependencies-{{ checksum "package.json" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
+            # Download and cache dependencies
+            - restore_cache:
+                keys:
+                - v1-dependencies-{{ checksum "package.json" }}
+                # fallback to using the latest cache if no exact match is found
+                - v1-dependencies-
 
-        - run: 
-            command: |
-              yarn install
-              npm run build
-              zip -r alice-website.zip ./dist/*
+            - run: 
+                command: |
+                  yarn install
+                  npm run build
+                  zip -r alice-website.zip ./dist/*
 
-        - store_artifacts:
-            path: alice-website.zip
+            - store_artifacts:
+                path: alice-website.zip
 
-        - save_cache:
-            paths:
-              - node_modules
-            key: v1-dependencies-{{ checksum "package.json" }}
-  - publish-github-release:
-      requires:
-        - build
-      filters:
-        branches:
-          ignore: /.*/
-      docker:
-        - image: cibuilds/github:0.10
-      steps:
-        - attach_workspace:
-            at: ./artifacts
-        - run:
-            name: "Publish Release on GitHub"
-            command: |
-              VERSION=Last Release
-              ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./artifacts/
+            - save_cache:
+                paths:
+                  - node_modules
+                key: v1-dependencies-{{ checksum "package.json" }}
+      - publish-github-release:
+          requires:
+            - build
+          filters:
+            branches:
+              ignore: /.*/
+          docker:
+            - image: cibuilds/github:0.10
+          steps:
+            - attach_workspace:
+                at: ./artifacts
+            - run:
+                name: "Publish Release on GitHub"
+                command: |
+                  VERSION=Last Release
+                  ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./artifacts/
 
