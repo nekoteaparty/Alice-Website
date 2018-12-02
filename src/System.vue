@@ -1,8 +1,5 @@
 <template>
     <el-form :model="setting" label-width="150px" style="width:500px;text-align:center;">
-        <el-form-item label="发送B站开播动态" style="text-align:left;">
-            <el-checkbox v-model="setting.postBiliDynamic"></el-checkbox>
-        </el-form-item>
         <el-form-item label="FFMPEG路径">
             <el-input v-model="setting.ffmpegPath"></el-input>
         </el-form-item>
