@@ -3,8 +3,11 @@
     <el-header style="text-align: right;">
       <div class="side-logo"></div>
       <a href="https://afdian.net/@aliceliveman" class="patron" target="_black">
-          <img src="./assets/mea.png" width="48" height="48"/>
+          <img src="./assets/mea.png" class="mea" width="48" height="48"/>
           <span>你好，<br/>我很可爱！</span>
+      </a>
+      <a href="https://vtuber.magictea.cc/" class="patron" target="_black">
+          <img src="./assets/magictea.png" height="54"/>
       </a>
       <span>{{account.nickname}}</span>
       <a href="javascript:" title="登出" @click="logout" style="color:#333;">
@@ -56,11 +59,11 @@
 }
 
 .patron {
-  padding-left: 12px;
+  margin-left: 12px;
   float: left;
 }
 
-.patron:hover img {
+.patron:hover .mea {
   animation: rotating 0.5s linear infinite;
 }
 
