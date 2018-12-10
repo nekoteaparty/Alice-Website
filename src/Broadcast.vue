@@ -1,6 +1,7 @@
 <template>
   <div>
     <el-button type="primary" size="medium" icon="el-icon-plus" @click="createTask" :loading="loading">手动推流</el-button>
+    <a href="/api/onedrive/redirectRecord" target="_blank" style="float:right;"><el-button type="primary" size="medium" icon="el-icon-document">查看录像</el-button></a>
     <hr/>
     <PagedTable :tableData="tableData" :tableHeader="tableHeader" :loading="loading">
       <el-table-column label="操作" width="200px">
