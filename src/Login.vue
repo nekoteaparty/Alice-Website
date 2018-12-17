@@ -47,7 +47,7 @@
       <span class="label-username" slot="prepend">用户名</span>
       <el-input type="password" v-model="password" slot="append">
         <template slot="prepend">密&nbsp;&nbsp;码</template>
-        <el-button type="primary" slot="append" @click="login">登录</el-button>
+        <el-button type="primary" slot="append" @click="login" v-loading.fullscreen.lock="loading">登录</el-button>
       </el-input>
     </el-input>
     <el-tag
@@ -142,6 +142,7 @@ export default {
       password: undefined,
       captcha: undefined,
       loginMode: "cookies",
+      loading: false,
       accountSite: "bilibili",
       accountSiteLabel: "哔哩哔哩"
     };
@@ -187,6 +188,7 @@ export default {
       }
     },
     doLogin() {
+      this.loading = true;
       this.$http
         .post("/api/login/login.json?loginMode=" + this.loginMode, {
           cookies: this.cookies,
@@ -197,6 +199,7 @@ export default {
         })
         .then(
           function(response) {
+            this.loading = false;
             // 这里是处理正确的回调
             if (response.data.code === 0) {
               sessionStorage.setItem(
@@ -209,6 +212,7 @@ export default {
             }
           },
           function(response) {
+            this.loading = false;
             this.$message.error("请求失败");
           }
         );
