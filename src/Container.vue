@@ -1,9 +1,5 @@
 <template>
   <el-container style="height:100%">
-    <el-alert center
-    title="爱丽丝将于次日00:30停机维护更新，届时所有转播都将中断，维护时间大约30分钟，请预先做好相应准备。"
-    type="warning">
-    </el-alert>
     <el-header style="text-align: right;">
       <div class="side-logo"></div>
       <a href="https://afdian.net/@aliceliveman" class="patron" target="_black">
