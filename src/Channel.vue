@@ -2,8 +2,9 @@
   <div>
     <el-button v-if="account.admin" type="primary" size="medium" icon="el-icon-plus" @click="channelInfo = { autoBalance: false }, addVisible = true" :loading="loading">添加频道</el-button>
     <el-tag type="info" v-if="!account.admin" disable-transitions color="#fff" style="border:none" class="el-icon-info"> 如需添加、删除频道请联系管理员，QQ群：<a href="tencent://groupwpa/?subcmd=all&param=7B2267726F757055696E223A3933363631383137322C2274696D655374616D70223A313534323934373835347D0A">936618172</a></el-tag>
+    <el-input style="float:right;width:280px;" placeholder="请输入频道名称、频道地址筛选条件" v-model="filter" size="medium" clearable></el-input>
     <hr/>
-    <PagedTable :tableData="tableData" :tableHeader="tableHeader" :loading="loading">
+    <PagedTable :tableData="tableData" :tableHeader="tableHeader" :filter="filter" :loading="loading">
       <el-table-column label="允许推流调配" width="150px">
           <template slot-scope="scope">
             <i class="el-icon-success" style="color:#67C23A" v-show="scope.row.autoBalance"></i>
@@ -89,7 +90,8 @@ export default {
       loading: false,
       editVisible: false,
       addVisible: false,
-      channelInfo: {}
+      channelInfo: {},
+      filter: ''
     };
   },
   methods: {
