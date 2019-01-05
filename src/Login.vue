@@ -133,15 +133,15 @@ export default {
     return {
       popoverVisible: false,
       loginModes: [
-        { label: "Cookies", value: "cookies" },
-        { label: "账户/密码", value: "userpwd" }
+        { label: "账户/密码", value: "userpwd" },
+        { label: "Cookies", value: "cookies" }
       ],
       showCookiesTip: false,
       cookies: undefined,
       username: undefined,
       password: undefined,
       captcha: undefined,
-      loginMode: "cookies",
+      loginMode: "userpwd",
       loading: false,
       accountSite: "bilibili",
       accountSiteLabel: "哔哩哔哩"
@@ -155,39 +155,6 @@ export default {
       img.src = src;
     },
     login() {
-      if (this.loginMode == "userpwd") {
-        this.$prompt(
-          <p class="captcha-prompt">
-            <span>请输入验证码</span>
-            <img
-              height="50"
-              alt="验证码图像"
-              src={
-                "/api/login/getCaptcha?accountSite=" +
-                this.accountSite +
-                "&_t=" +
-                new Date().getTime()
-              }
-            />
-          </p>,
-          "安全验证",
-          {
-            confirmButtonText: "确定",
-            cancelButtonText: "取消",
-            inputPattern: /.+/,
-            inputErrorMessage: "请输入验证码"
-          }
-        )
-          .then(({ value }) => {
-            this.captcha = value;
-            this.doLogin();
-          })
-          .catch(() => {});
-      } else {
-        this.doLogin();
-      }
-    },
-    doLogin() {
       this.loading = true;
       this.$http
         .post("/api/login/login.json?loginMode=" + this.loginMode, {
@@ -208,6 +175,33 @@ export default {
               );
               this.$router.push({ path: "/main/broadcast" });
             } else {
+              if(response.data.code === -101){
+                this.$prompt(
+                  <p class="captcha-prompt">
+                    <span>请输入验证码</span>
+                    <img
+                      height="50"
+                      alt="验证码图像"
+                      src={
+                        "/api/login/getCaptcha?accountSite=" +
+                        this.accountSite +
+                        "&_t=" +
+                        new Date().getTime()
+                      }
+                    />
+                  </p>,
+                  "安全验证",
+                  {
+                    confirmButtonText: "确定",
+                    cancelButtonText: "取消",
+                    inputPattern: /.+/,
+                    inputErrorMessage: "请输入验证码"
+                  }
+                ).then(({ value }) => {
+                  this.captcha = value;
+                  this.login();
+                }).catch(() => {});
+              }
               this.$message.error(response.data.message);
             }
           },
