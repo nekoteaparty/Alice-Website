@@ -29,13 +29,6 @@
   </div>
 </template>
 
-<style>
-.od-config .el-message-box__input {
-  padding-top: 0px;
-}
-</style>
-
-
 <script>
 export default {
   data() {

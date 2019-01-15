@@ -25,13 +25,16 @@
     </PagedTable>
     <el-dialog title="频道编辑" :visible.sync="editVisible" width="40%">
         <el-form :model="channelInfo">
-            <el-form-item v-for="item in tableHeader" :label="item.label" :key="item.prop" label-width="100px">
+            <el-form-item v-for="item in tableHeader" :label="item.label" :key="item.prop" label-width="120px">
                 <el-input v-model="channelInfo[`${item.prop}`]" autocomplete="off"></el-input>
             </el-form-item>
-            <el-form-item label="默认开播分区" label-width="100px">
+            <el-form-item label="默认开播分区" label-width="120px">
                 <area-selector v-model="channelInfo.defaultArea" :value="channelInfo.defaultArea"></area-selector>
             </el-form-item>
-            <el-form-item label="其他推流设置" label-width="100px">            
+            <el-form-item label="转播登录Cookie" label-width="120px">
+                <el-input v-model="channelInfo.cookies" autocomplete="off" placeholder="[如无需修改此项请留空]"></el-input>
+            </el-form-item>
+            <el-form-item label="其他推流设置" label-width="120px">            
                 <el-checkbox v-model="channelInfo.autoBalance">允许推流调配</el-checkbox>
             </el-form-item>
         </el-form>
@@ -41,13 +44,16 @@
     </el-dialog>
     <el-dialog title="频道新增" :visible.sync="addVisible" width="40%">
         <el-form :model="channelInfo">
-            <el-form-item v-for="item in tableHeader" :label="item.label" :key="item.prop" label-width="100px">
+            <el-form-item v-for="item in tableHeader" :label="item.label" :key="item.prop" label-width="120px">
                 <el-input v-model="channelInfo[`${item.prop}`]" autocomplete="off"></el-input>
             </el-form-item>
-            <el-form-item label="默认开播分区" label-width="100px">
+            <el-form-item label="默认开播分区" label-width="120px">
                 <area-selector v-model="channelInfo.defaultArea"></area-selector>
             </el-form-item>
-            <el-form-item label="其他推流设置" label-width="100px">            
+            <el-form-item label="转播登录Cookie" label-width="120px">
+                <el-input v-model="channelInfo.cookies" autocomplete="off" placeholder="如转播的节目为收费/会员专享节目，请输入对应平台的转播登录Cookie"></el-input>
+            </el-form-item>
+            <el-form-item label="其他推流设置" label-width="120px">            
                 <el-checkbox v-model="channelInfo.autoBalance">允许推流调配</el-checkbox>
             </el-form-item>
         </el-form>

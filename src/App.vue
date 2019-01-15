@@ -39,4 +39,8 @@ a {
   color: #409eff;
   text-decoration: none;
 }
+
+.od-config .el-message-box__input {
+  padding-top: 0px;
+}
 </style>
