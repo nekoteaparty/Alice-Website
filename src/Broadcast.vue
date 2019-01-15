@@ -82,6 +82,7 @@ export default {
         { prop: "channelName", label: "节目频道" },
         { prop: "videoTitle", label: "节目标题", width: "460px" }
       ],
+      broadcastCookie: null,
       loading: false,
       detailVisible: false,
       detailItem: {},
@@ -189,17 +190,22 @@ export default {
     },
     createTask() {
       this.$prompt(
-        "请输入需要推流的媒体地址\n例:https://www.youtube.com/watch?v=KufDfy90fDo",
+        <div class="od-config">
+          <p>转播登录Cookie：</p>
+          <el-input v-model={this.broadcastCookie} placeholder="如为收费/会员专享节目，请输入对应平台登录Cookie"/>
+          <p style="margin-bottom:-15px">请输入需要推流的媒体地址：</p>
+        </div>,
         "手动推流",
         {
           inputPattern: /.+/,
           inputErrorMessage: "请输入需要推流的媒体地址",
           confirmButtonText: "确定",
-          cancelButtonText: "取消"
+          cancelButtonText: "取消",
+          inputPlaceholder: '例：https://www.youtube.com/watch?v=KufDfy90fDo'
         }
       ).then(({ value }) => {
         this.loading = true;
-        let apiUrl = "/api/broadcast/createTask.json?videoUrl=" + value;
+        let apiUrl = "/api/broadcast/createTask.json?videoUrl=" + value + "&cookies=" + encodeURIComponent(this.broadcastCookie);
         this.$http.get(apiUrl).then(
           function(response) {
             // 这里是处理正确的回调
