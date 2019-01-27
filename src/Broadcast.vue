@@ -9,12 +9,12 @@
             <el-button size="mini" @click="showDetail(scope.$index, scope.row)">详情</el-button>
             <el-button size="mini" style="margin-left: 0px;" type="primary" @click="editVisible = true, editItem = scope.row">管理</el-button>
             <el-button size="mini" style="margin-left: 0px;" type="success" @click="adoptTask(scope.row.videoId)" v-if="!!!scope.row.roomId">认领</el-button>
-            <el-popover placement="bottom" width="200" :ref="`popover-${scope.$index}`">
+            <el-popover placement="bottom" width="200" :ref="`popover-${scope.$index}`" trigger="click" v-if="!!scope.row.roomId">
               <p><i class="el-icon-warning"></i> 终止后系统将不会重新推流, 是否继续?</p>
               <div style="text-align: right; margin-top:8px;">
                 <el-button type="primary" size="mini" @click="stopTask(scope.$index, scope.row)">继续</el-button>
               </div>
-              <el-button slot="reference" size="mini" type="danger" v-if="!!scope.row.roomId">终止</el-button>
+              <el-button slot="reference" size="mini" type="danger">终止</el-button>
             </el-popover>
         </template>
       </el-table-column>
@@ -35,16 +35,22 @@
         <el-button type="primary" size="medium" @click="detailVisible = false">确 定</el-button>
       </span>
     </el-dialog>
-    <el-dialog title="推流管理" :visible.sync="editVisible" width="450px">
+    <el-dialog title="推流管理" :visible.sync="editVisible" width="550px">
       <el-form label-position="right" :model="editItem">
-        <el-form-item label="直播分区" label-width="100px">
-          <area-selector v-model="editItem.area" :value="editItem.area"></area-selector>
-        </el-form-item>
         <el-form-item label="自主规制" label-width="100px">
           <el-checkbox v-model="editItem.videoBanned">全屏马赛克</el-checkbox>
           <el-checkbox v-model="editItem.audioBanned">强制单声道</el-checkbox>
+          <el-tag type="info" disable-transitions color="#fff" style="border:none" class="el-icon-info"> 修改以上设置将会导致推流短时间的中断</el-tag>
         </el-form-item>
-        <el-tag type="info" disable-transitions color="#fff" style="border:none" class="el-icon-info"> 修改推流信息将会导致推流短时间的中断</el-tag>
+        <el-form-item label="直播分区" label-width="100px">
+          <area-selector v-model="editItem.area" :value="editItem.area"></area-selector>
+        </el-form-item>
+        <el-form-item label="直播间标题" label-width="100px">
+          <el-input v-model="editItem.roomTitle" placeholder="[无需修改请留空]"></el-input>
+        </el-form-item>
+        <el-form-item label="其他设置" label-width="100px">
+          <el-checkbox v-model="editItem.needRecord">直播后保存录像</el-checkbox>
+        </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button type="primary" size="medium" @click="editTask(), editVisible = false">修 改</el-button>

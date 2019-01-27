@@ -36,6 +36,7 @@
             </el-form-item>
             <el-form-item label="其他推流设置" label-width="120px">            
                 <el-checkbox v-model="channelInfo.autoBalance">允许推流调配</el-checkbox>
+                <el-checkbox v-model="channelInfo.needRecord">自动开启录像</el-checkbox>
             </el-form-item>
         </el-form>
         <span slot="footer" class="dialog-footer">
@@ -55,6 +56,7 @@
             </el-form-item>
             <el-form-item label="其他推流设置" label-width="120px">            
                 <el-checkbox v-model="channelInfo.autoBalance">允许推流调配</el-checkbox>
+                <el-checkbox v-model="channelInfo.needRecord">自动开启录像</el-checkbox>
             </el-form-item>
         </el-form>
         <span slot="footer" class="dialog-footer">
