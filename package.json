@@ -9,6 +9,8 @@
   },
   "dependencies": {
     "element-ui": "^2.3.4",
+    "postcss-import": "^12.0.1",
+    "postcss-url": "^8.0.0",
     "vue": "^2.5.16",
     "vue-m-crop": "git+https://github.com/mengdu/m-crop.git",
     "vue-resource": "^1.5.1",
