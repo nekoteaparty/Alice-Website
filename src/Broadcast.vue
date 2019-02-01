@@ -38,7 +38,7 @@
     <el-dialog title="推流管理" :visible.sync="editVisible" width="550px">
       <el-form label-position="right" :model="editItem">
         <el-form-item label="自主规制" label-width="100px">
-          <el-checkbox v-model="editItem.videoBanned">全屏马赛克</el-checkbox>
+          <el-button type="primary" size="small" @click="videoManagerVisible = true">视频内容规制</el-button>
           <el-checkbox v-model="editItem.audioBanned">强制单声道</el-checkbox>
           <el-tag type="info" disable-transitions color="#fff" style="border:none" class="el-icon-info"> 修改以上设置将会导致推流短时间的中断</el-tag>
         </el-form-item>
@@ -56,6 +56,33 @@
         <el-button type="primary" size="medium" @click="editTask(), editVisible = false">修 改</el-button>
       </span>
     </el-dialog>
+    <el-dialog title="视频内容规制" :visible.sync="videoManagerVisible" width="886px" :close-on-click-modal="false">
+      <el-radio-group v-model="editItem.cropConf.videoBannedType">
+        <el-radio label="NONE">取消内容规制</el-radio>
+        <el-radio v-model="editItem.cropConf.videoBannedType" label="FULL_SCREEN">全屏</el-radio>
+        <el-radio v-model="editItem.cropConf.videoBannedType" label="AREA_SCREEN" v-if="account.vip">区域</el-radio>
+        <el-tag  v-if="!account.vip"
+          type="info"
+          disable-transitions
+          color="#fff"
+          style="border:none"
+          class="el-icon-info"
+        >&nbsp;如需区域打码，请加QQ群936618172联系群主。</el-tag>
+      </el-radio-group>
+      <m-crop style="margin-top:20px;" v-if="editItem.cropConf.videoBannedType == 'AREA_SCREEN'" ref="crop"
+        :src="`/api/keyframe/${editItem.videoId}?_t=${new Date().getTime()}`"
+        :auto="true"
+        :show-view="true"
+        :show-ctrl="true"
+        :ctrl-width="editItem.cropConf.ctrlWidth"
+        :ctrl-height="editItem.cropConf.ctrlHeight"
+        :ctrl-left="editItem.cropConf.ctrlLeft"
+        :ctrl-top="editItem.cropConf.ctrlTop"
+        @stop="onCrop"></m-crop>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" size="medium" @click="cropConfSave(), videoManagerVisible = false">保 存</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -71,6 +98,23 @@
   color: #606266;
   cursor: default;
 }
+
+.cut-box {
+   max-width: none;
+   max-height: none;
+   min-width: auto;
+}
+
+.cut-box .cut-shade {
+  background: none;
+}
+.cut-box .cut-view {
+  background: none;
+  -webkit-filter: blur(2px); 
+  -moz-filter: blur(2px);
+  -ms-filter: blur(2px);    
+  filter: blur(2px);
+}
 </style>
 
 
@@ -80,6 +124,7 @@ import AreaSelector from "./AreaSelector.vue";
 export default {
   data() {
     return {
+      account: JSON.parse(sessionStorage.getItem("account")),
       tableData: [],
       tableHeader: [
         { prop: "nickname", label: "推流账号" },
@@ -93,7 +138,10 @@ export default {
       detailVisible: false,
       detailItem: {},
       editVisible: false,
-      editItem: {}
+      editItem: {
+          cropConf: {}
+      },
+      videoManagerVisible: false
     };
   },
   methods: {
@@ -116,6 +164,44 @@ export default {
           }
           this.$message.error("请求失败");
           this.loading = false;
+        }
+      );
+    },
+    onCrop(e) {
+      var img = e.img;
+      var scale = img.naturalHeight / e.height;
+      var clipTop = e.clipTop * scale
+      var clipLeft = e.clipLeft * scale;
+      var clipWidth = e.clipWidth * scale;
+      var clipHeight = e.clipHeight * scale;
+      console.log(clipLeft + "," + clipTop + "," + clipWidth + "," + clipHeight);
+    },
+    cropConfSave() {
+      let apiUrl = "/api/broadcast/cropConfSave.json?videoId=" + this.editItem.videoId;
+      var cutInfo = this.$refs[`crop`].getCutInfo();
+      var scale = cutInfo.img.naturalHeight / cutInfo.height;
+      this.editItem.cropConf.ctrlTop = cutInfo.clipTop * scale
+      this.editItem.cropConf.ctrlLeft = cutInfo.clipLeft * scale;
+      this.editItem.cropConf.ctrlWidth = cutInfo.clipWidth * scale;
+      this.editItem.cropConf.ctrlHeight = cutInfo.clipHeight * scale;
+      this.$http.post(apiUrl, this.editItem.cropConf).then(
+        function(response) {
+          // 这里是处理正确的回调
+          if (response.data.code === 0) {
+            this.$message({
+              message: "自主规制配置保存成功",
+              type: "success"
+            });
+            this.taskList();
+          } else {
+            this.$message.error(response.data.message);
+          }
+        },
+        function(response) {
+          if (response.status === 401) {
+            this.$router.push({ path: "/login" });
+          }
+          this.$message.error("请求失败");
         }
       );
     },

@@ -23,7 +23,7 @@
                 <el-tag type="danger" size="medium" disable-transitions v-if="scope.row.disable">无 效</el-tag>
             </template>
         </el-table-column>
-        <el-table-column label="操作" width="100px" v-if="account.admin">
+        <el-table-column label="操作" width="160px" v-if="account.admin">
             <template slot-scope="scope">
                 <el-popover placement="bottom" width="200" :ref="`popover-${scope.$index}`">
                     <p><i class="el-icon-warning"></i> 账号删除后系统将中止正在进行的推流任务, 是否继续?</p>
@@ -32,6 +32,7 @@
                     </div>
                     <el-button slot="reference" size="mini" type="danger">删除</el-button>
                 </el-popover>
+                <el-button slot="reference" size="mini" type="primary" @click="toggleVip(scope.row.accountId, scope.$index)">{{!scope.row.vip?'设为':'取消'}}VIP</el-button>
             </template>
         </el-table-column>
     </PagedTable>
@@ -130,6 +131,29 @@ export default {
           this.loading = false;
         }
       );
+    },
+    toggleVip(accountId, index){
+       this.$http.post("/api/account/toggleVip.json?accountId=" + accountId).then(
+        function(response) {
+          // 这里是处理正确的回调
+          if (response.data.code === 0) {
+            this.$message({
+              message: "操作成功完成",
+              type: "success"
+            });
+            this.accountList();
+          } else {
+            this.$message.error(response.data.message);
+            this.loading = false;
+          }
+        },
+        function(response) {
+          if (response.status === 401) {
+            this.$router.push({ path: "/login" });
+          }
+          this.$message.error("请求失败");
+          this.loading = false;
+        });
     },
     removeAccount(accountId, index) {
       let apiUrl = "/api/account/removeAccount.json?accountId=" + accountId;

@@ -10,6 +10,7 @@
   "dependencies": {
     "element-ui": "^2.3.4",
     "vue": "^2.5.16",
+    "vue-m-crop": "git+https://github.com/mengdu/m-crop.git",
     "vue-resource": "^1.5.1",
     "vue-router": "^3.0.1"
   },
