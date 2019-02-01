@@ -28,6 +28,7 @@ jobs:
 
       - run: 
           command: |
+            npm install git+https://github.com/mengdu/m-crop.git
             yarn install
             npm run build
             zip -r alice-website.zip ./dist/*
