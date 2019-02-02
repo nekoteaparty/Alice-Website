@@ -58,7 +58,7 @@
     </el-dialog>
     <el-dialog title="视频内容规制" :visible.sync="videoManagerVisible" width="886px" :close-on-click-modal="false">
       <el-radio-group v-model="editItem.cropConf.videoBannedType">
-        <el-radio label="NONE">取消内容规制</el-radio>
+        <el-radio v-model="editItem.cropConf.videoBannedType" label="NONE">取消内容规制</el-radio>
         <el-radio v-model="editItem.cropConf.videoBannedType" label="FULL_SCREEN">全屏</el-radio>
         <el-radio v-model="editItem.cropConf.videoBannedType" label="AREA_SCREEN" v-if="account.vip">区域</el-radio>
         <el-tag  v-if="!account.vip"
