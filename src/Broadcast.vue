@@ -56,7 +56,7 @@
         <el-button type="primary" size="medium" @click="editTask(), editVisible = false">修 改</el-button>
       </span>
     </el-dialog>
-    <el-dialog title="视频内容规制" :visible.sync="videoManagerVisible" width="886px" :close-on-click-modal="false">
+    <el-dialog title="视频内容规制" :visible.sync="videoManagerVisible" width="890px" :close-on-click-modal="false">
       <el-radio-group v-model="editItem.cropConf.videoBannedType">
         <el-radio v-model="editItem.cropConf.videoBannedType" label="NONE">取消内容规制</el-radio>
         <el-radio v-model="editItem.cropConf.videoBannedType" label="FULL_SCREEN">全屏</el-radio>
