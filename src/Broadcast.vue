@@ -27,9 +27,6 @@
         <el-form-item label="节目编号" label-width="80px">
           <el-input v-model="detailItem.videoId" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="媒体地址" label-width="80px">
-          <a :href="detailItem.mediaUrl" target="_black">{{detailItem.mediaUrl}}</a>
-        </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button type="primary" size="medium" @click="detailVisible = false">确 定</el-button>
