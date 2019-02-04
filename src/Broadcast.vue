@@ -1,27 +1,59 @@
 <template>
   <div>
-    <el-button type="primary" size="medium" icon="el-icon-plus" @click="createTask" :loading="loading">手动推流</el-button>
-    <a href="/api/onedrive/redirectRecord" target="_blank" style="float:right;"><el-button type="primary" size="medium" icon="el-icon-document">查看录像</el-button></a>
-    <hr/>
+    <el-button
+      type="primary"
+      size="medium"
+      icon="el-icon-plus"
+      @click="createTask"
+      :loading="loading"
+    >手动推流</el-button>
+    <a href="/api/onedrive/redirectRecord" target="_blank" style="float:right;">
+      <el-button type="primary" size="medium" icon="el-icon-document">查看录像</el-button>
+    </a>
+    <hr>
     <PagedTable :tableData="tableData" :tableHeader="tableHeader" :loading="loading">
       <el-table-column label="操作" width="200px">
         <template slot-scope="scope">
-            <el-button size="mini" @click="showDetail(scope.$index, scope.row)">详情</el-button>
-            <el-button size="mini" style="margin-left: 0px;" type="primary" @click="editVisible = true, editItem = scope.row">管理</el-button>
-            <el-button size="mini" style="margin-left: 0px;" type="success" @click="adoptTask(scope.row.videoId)" v-if="!!!scope.row.roomId">认领</el-button>
-            <el-popover placement="bottom" width="200" :ref="`popover-${scope.$index}`" trigger="click" v-if="!!scope.row.roomId">
-              <p><i class="el-icon-warning"></i> 终止后系统将不会重新推流, 是否继续?</p>
-              <div style="text-align: right; margin-top:8px;">
-                <el-button type="primary" size="mini" @click="stopTask(scope.$index, scope.row)">继续</el-button>
-              </div>
-              <el-button slot="reference" size="mini" type="danger">终止</el-button>
-            </el-popover>
+          <el-button size="mini" @click="showDetail(scope.$index, scope.row)">详情</el-button>
+          <el-button
+            size="mini"
+            style="margin-left: 0px;"
+            type="primary"
+            @click="editVisible = true, editItem = scope.row"
+          >管理</el-button>
+          <el-button
+            size="mini"
+            style="margin-left: 0px;"
+            type="success"
+            @click="adoptTask(scope.row.videoId)"
+            v-if="!!!scope.row.roomId"
+          >认领</el-button>
+          <el-popover
+            placement="bottom"
+            width="200"
+            :ref="`popover-${scope.$index}`"
+            trigger="click"
+            v-if="!!scope.row.roomId"
+          >
+            <p>
+              <i class="el-icon-warning"></i> 终止后系统将不会重新推流, 是否继续?
+            </p>
+            <div style="text-align: right; margin-top:8px;">
+              <el-button type="primary" size="mini" @click="stopTask(scope.$index, scope.row)">继续</el-button>
+            </div>
+            <el-button slot="reference" size="mini" type="danger">终止</el-button>
+          </el-popover>
         </template>
       </el-table-column>
     </PagedTable>
     <el-dialog title="推流详情" :visible.sync="detailVisible" width="40%">
       <el-form label-position="left" :model="detailItem" disabled>
-        <el-form-item v-for="item in tableHeader" :label="item.label" :key="item.prop" label-width="80px">
+        <el-form-item
+          v-for="item in tableHeader"
+          :label="item.label"
+          :key="item.prop"
+          label-width="80px"
+        >
           <el-input v-model="detailItem[`${item.prop}`]" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="节目编号" label-width="80px">
@@ -37,7 +69,13 @@
         <el-form-item label="自主规制" label-width="100px">
           <el-button type="primary" size="small" @click="videoManagerVisible = true">视频内容规制</el-button>
           <el-checkbox v-model="editItem.audioBanned">强制单声道</el-checkbox>
-          <el-tag type="info" disable-transitions color="#fff" style="border:none" class="el-icon-info"> 修改以上设置将会导致推流短时间的中断</el-tag>
+          <el-tag
+            type="info"
+            disable-transitions
+            color="#fff"
+            style="border:none"
+            class="el-icon-info"
+          >修改以上设置将会导致推流短时间的中断</el-tag>
         </el-form-item>
         <el-form-item label="直播分区" label-width="100px">
           <area-selector v-model="editItem.area" :value="editItem.area"></area-selector>
@@ -53,12 +91,22 @@
         <el-button type="primary" size="medium" @click="editTask(), editVisible = false">修 改</el-button>
       </span>
     </el-dialog>
-    <el-dialog title="视频内容规制" :visible.sync="videoManagerVisible" width="890px" :close-on-click-modal="false">
+    <el-dialog
+      title="视频内容规制"
+      :visible.sync="videoManagerVisible"
+      width="890px"
+      :close-on-click-modal="false"
+    >
       <el-radio-group v-model="editItem.cropConf.videoBannedType">
         <el-radio v-model="editItem.cropConf.videoBannedType" label="NONE">取消内容规制</el-radio>
         <el-radio v-model="editItem.cropConf.videoBannedType" label="FULL_SCREEN">全屏</el-radio>
-        <el-radio v-model="editItem.cropConf.videoBannedType" label="AREA_SCREEN" v-if="account.vip">区域</el-radio>
-        <el-tag  v-if="!account.vip"
+        <el-radio
+          v-model="editItem.cropConf.videoBannedType"
+          label="AREA_SCREEN"
+          v-if="account.vip"
+        >区域</el-radio>
+        <el-tag
+          v-if="!account.vip"
           type="info"
           disable-transitions
           color="#fff"
@@ -66,7 +114,10 @@
           class="el-icon-info"
         >&nbsp;如需区域打码，请加QQ群936618172联系群主。</el-tag>
       </el-radio-group>
-      <m-crop style="margin-top:20px;" v-if="editItem.cropConf.videoBannedType == 'AREA_SCREEN'" ref="crop"
+      <m-crop
+        style="margin-top:20px;"
+        v-if="editItem.cropConf.videoBannedType == 'AREA_SCREEN'"
+        ref="crop"
         :src="`/api/keyframe/${editItem.videoId}?_t=${new Date().getTime()}`"
         :auto="true"
         :show-view="true"
@@ -75,9 +126,14 @@
         :ctrl-height="editItem.cropConf.ctrlHeight"
         :ctrl-left="editItem.cropConf.ctrlLeft"
         :ctrl-top="editItem.cropConf.ctrlTop"
-        @stop="onCrop"></m-crop>
+        @stop="onCrop"
+      ></m-crop>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" size="medium" @click="cropConfSave(), videoManagerVisible = false">保 存</el-button>
+        <el-button
+          type="primary"
+          size="medium"
+          @click="cropConfSave(), videoManagerVisible = false"
+        >保 存</el-button>
       </span>
     </el-dialog>
   </div>
@@ -97,9 +153,9 @@
 }
 
 .cut-box {
-   max-width: none;
-   max-height: none;
-   min-width: auto;
+  max-width: none;
+  max-height: none;
+  min-width: auto;
 }
 
 .cut-box .cut-shade {
@@ -107,9 +163,9 @@
 }
 .cut-box .cut-view {
   background: none;
-  -webkit-filter: blur(2px); 
+  -webkit-filter: blur(2px);
   -moz-filter: blur(2px);
-  -ms-filter: blur(2px);    
+  -ms-filter: blur(2px);
   filter: blur(2px);
 }
 </style>
@@ -136,7 +192,7 @@ export default {
       detailItem: {},
       editVisible: false,
       editItem: {
-          cropConf: {}
+        cropConf: {}
       },
       videoManagerVisible: false
     };
@@ -167,20 +223,25 @@ export default {
     onCrop(e) {
       var img = e.img;
       var scale = img.naturalHeight / e.height;
-      var clipTop = e.clipTop * scale
+      var clipTop = e.clipTop * scale;
       var clipLeft = e.clipLeft * scale;
       var clipWidth = e.clipWidth * scale;
       var clipHeight = e.clipHeight * scale;
-      console.log(clipLeft + "," + clipTop + "," + clipWidth + "," + clipHeight);
+      console.log(
+        clipLeft + "," + clipTop + "," + clipWidth + "," + clipHeight
+      );
     },
     cropConfSave() {
-      let apiUrl = "/api/broadcast/cropConfSave.json?videoId=" + this.editItem.videoId;
-      var cutInfo = this.$refs[`crop`].getCutInfo();
-      var scale = cutInfo.img.naturalHeight / cutInfo.height;
-      this.editItem.cropConf.ctrlTop = cutInfo.clipTop * scale
-      this.editItem.cropConf.ctrlLeft = cutInfo.clipLeft * scale;
-      this.editItem.cropConf.ctrlWidth = cutInfo.clipWidth * scale;
-      this.editItem.cropConf.ctrlHeight = cutInfo.clipHeight * scale;
+      let apiUrl =
+        "/api/broadcast/cropConfSave.json?videoId=" + this.editItem.videoId;
+      if (this.$refs[`crop`]) {
+        var cutInfo = this.$refs[`crop`].getCutInfo();
+        var scale = cutInfo.img.naturalHeight / cutInfo.height;
+        this.editItem.cropConf.ctrlTop = cutInfo.clipTop * scale;
+        this.editItem.cropConf.ctrlLeft = cutInfo.clipLeft * scale;
+        this.editItem.cropConf.ctrlWidth = cutInfo.clipWidth * scale;
+        this.editItem.cropConf.ctrlHeight = cutInfo.clipHeight * scale;
+      }
       this.$http.post(apiUrl, this.editItem.cropConf).then(
         function(response) {
           // 这里是处理正确的回调
@@ -255,7 +316,7 @@ export default {
       this.detailVisible = true;
       this.detailItem = row;
     },
-    adoptTask(videoId){
+    adoptTask(videoId) {
       this.$http.get("/api/broadcast/adoptTask.json?videoId=" + videoId).then(
         function(response) {
           // 这里是处理正确的回调
@@ -281,7 +342,10 @@ export default {
       this.$prompt(
         <div class="od-config">
           <p>转播登录Cookie：</p>
-          <el-input v-model={this.broadcastCookie} placeholder="如为收费/会员专享节目，请输入对应平台登录Cookie"/>
+          <el-input
+            v-model={this.broadcastCookie}
+            placeholder="如为收费/会员专享节目，请输入对应平台登录Cookie"
+          />
           <p style="margin-bottom:-15px">请输入需要推流的媒体地址：</p>
         </div>,
         "手动推流",
@@ -290,11 +354,15 @@ export default {
           inputErrorMessage: "请输入需要推流的媒体地址",
           confirmButtonText: "确定",
           cancelButtonText: "取消",
-          inputPlaceholder: '例：https://www.youtube.com/watch?v=KufDfy90fDo'
+          inputPlaceholder: "例：https://www.youtube.com/watch?v=KufDfy90fDo"
         }
       ).then(({ value }) => {
         this.loading = true;
-        let apiUrl = "/api/broadcast/createTask.json?videoUrl=" + value + "&cookies=" + encodeURIComponent(this.broadcastCookie);
+        let apiUrl =
+          "/api/broadcast/createTask.json?videoUrl=" +
+          value +
+          "&cookies=" +
+          encodeURIComponent(this.broadcastCookie);
         this.$http.get(apiUrl).then(
           function(response) {
             // 这里是处理正确的回调
