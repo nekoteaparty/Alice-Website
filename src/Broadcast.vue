@@ -122,10 +122,10 @@
         :auto="true"
         :show-view="true"
         :show-ctrl="true"
-        :ctrl-width="editItem.cropConf.ctrlWidth"
-        :ctrl-height="editItem.cropConf.ctrlHeight"
-        :ctrl-left="editItem.cropConf.ctrlLeft"
-        :ctrl-top="editItem.cropConf.ctrlTop"
+        :ctrl-width="editItem.cropConf.ctrlWidth * 0.66667"
+        :ctrl-height="editItem.cropConf.ctrlHeight * 0.66667"
+        :ctrl-left="editItem.cropConf.ctrlLeft * 0.66667"
+        :ctrl-top="editItem.cropConf.ctrlTop * 0.66667"
         @stop="onCrop"
       ></m-crop>
       <span slot="footer" class="dialog-footer">
