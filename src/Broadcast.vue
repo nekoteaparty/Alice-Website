@@ -67,7 +67,11 @@
     <el-dialog title="推流管理" :visible.sync="editVisible" width="550px">
       <el-form label-position="right" :model="editItem">
         <el-form-item label="自主规制" label-width="100px">
-          <el-button type="primary" size="small" @click="videoManagerVisible = true">视频内容规制</el-button>
+          <el-button
+            type="primary"
+            size="small"
+            @click="blurSize = editItem.cropConf.blurSize, cropConf = JSON.parse(JSON.stringify(editItem.cropConf)), videoManagerVisible = true"
+          >视频内容规制</el-button>
           <el-checkbox v-model="editItem.audioBanned">强制单声道</el-checkbox>
           <el-tag
             type="info"
@@ -105,27 +109,39 @@
           label="AREA_SCREEN"
           v-if="account.vip"
         >区域</el-radio>
-        <el-tag
-          v-if="!account.vip"
-          type="info"
-          disable-transitions
-          color="#fff"
-          style="border:none"
-          class="el-icon-info"
-        >&nbsp;如需区域打码，请加QQ群936618172联系群主。</el-tag>
       </el-radio-group>
+      <el-tag
+        v-if="!account.vip"
+        type="info"
+        disable-transitions
+        color="#fff"
+        style="border:none"
+        class="el-icon-info"
+      >&nbsp;如需区域打码，请加QQ群936618172联系群主。</el-tag>
+      <template v-if="editItem.cropConf.videoBannedType == 'AREA_SCREEN'">
+        <div style="display:inline-block;margin-left:20px;">
+          <label>模糊强度:</label>
+          <el-slider
+            v-model="editItem.cropConf.blurSize"
+            :min="0"
+            :max="10"
+            style="width:120px;display:inline-block;vertical-align: middle;margin-left:10px;"
+            @change="onBlurSizeChange"
+          ></el-slider>
+        </div>
+      </template>
       <m-crop
-        style="margin-top:20px;"
+        style="margin-top:10px;"
         v-if="editItem.cropConf.videoBannedType == 'AREA_SCREEN'"
         ref="crop"
         :src="`/api/keyframe/${editItem.videoId}?_t=${new Date().getTime()}`"
         :auto="true"
         :show-view="true"
         :show-ctrl="true"
-        :ctrl-width="editItem.cropConf.ctrlWidth * 0.66667"
-        :ctrl-height="editItem.cropConf.ctrlHeight * 0.66667"
-        :ctrl-left="editItem.cropConf.ctrlLeft * 0.66667"
-        :ctrl-top="editItem.cropConf.ctrlTop * 0.66667"
+        :ctrl-width="cropConf.ctrlWidth * 0.66667"
+        :ctrl-height="cropConf.ctrlHeight * 0.66667"
+        :ctrl-left="cropConf.ctrlLeft * 0.66667"
+        :ctrl-top="cropConf.ctrlTop * 0.66667"
         @stop="onCrop"
       ></m-crop>
       <span slot="footer" class="dialog-footer">
@@ -163,10 +179,6 @@
 }
 .cut-box .cut-view {
   background: none;
-  -webkit-filter: blur(2px);
-  -moz-filter: blur(2px);
-  -ms-filter: blur(2px);
-  filter: blur(2px);
 }
 </style>
 
@@ -194,6 +206,8 @@ export default {
       editItem: {
         cropConf: {}
       },
+      cropConf: {},
+      blurSize: 0,
       videoManagerVisible: false
     };
   },
@@ -220,16 +234,20 @@ export default {
         }
       );
     },
+    onBlurSizeChange() {
+      if (this.$refs[`crop`]) {
+        this.$refs[`crop`].$refs[`view-img`].style["filter"] =
+          "blur(" + this.editItem.cropConf.blurSize + "px)";
+      }
+    },
     onCrop(e) {
       var img = e.img;
       var scale = img.naturalHeight / e.height;
-      var clipTop = e.clipTop * scale;
-      var clipLeft = e.clipLeft * scale;
-      var clipWidth = e.clipWidth * scale;
-      var clipHeight = e.clipHeight * scale;
-      console.log(
-        clipLeft + "," + clipTop + "," + clipWidth + "," + clipHeight
-      );
+      this.cropConf.ctrlTop = e.clipTop * scale;
+      this.cropConf.ctrlLeft = e.clipLeft * scale;
+      this.cropConf.ctrlWidth = e.clipWidth * scale;
+      this.cropConf.ctrlHeight = e.clipHeight * scale;
+      console.log(this.cropConf);
     },
     cropConfSave() {
       let apiUrl =
@@ -391,6 +409,14 @@ export default {
   components: { PagedTable, AreaSelector },
   created() {
     this.taskList();
+  },
+  watch: {
+    "editItem.cropConf.videoBannedType": function() {
+      this.$nextTick(this.onBlurSizeChange);
+    },
+    videoManagerVisible: function() {
+      this.$nextTick(this.onBlurSizeChange);
+    }
   }
 };
 </script>
