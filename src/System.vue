@@ -16,6 +16,12 @@
       <el-form-item label="默认转播分辨率">
         <el-input v-model="setting.defaultResolution"></el-input>
       </el-form-item>
+      <el-form-item label="启动预编码功能" style="text-align: left;">
+        <el-checkbox v-model="setting.preReEncode"></el-checkbox>
+        <el-tooltip class="item" effect="dark" content="用于对进行区域打码的720P/60FPS视频进行预编码，降低转码服务器的性能需求，会占用爱丽丝所在服务器的CPU资源，转码服务器和爱丽丝共用一台服务器的不建议开启。" placement="top">
+          <i class="el-icon-question"></i>
+        </el-tooltip>
+      </el-form-item>
       <el-button type="primary" @click="saveSetting()">保&nbsp;&nbsp;存</el-button>
     </el-form>
     <hr>
