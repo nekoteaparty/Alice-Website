@@ -124,7 +124,7 @@
           <el-slider
             v-model="editItem.cropConf.blurSize"
             :min="0"
-            :max="10"
+            :max="5"
             style="width:120px;display:inline-block;vertical-align: middle;margin-left:10px;"
             @change="onBlurSizeChange"
           ></el-slider>
