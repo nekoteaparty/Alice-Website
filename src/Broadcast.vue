@@ -36,12 +36,18 @@
             v-if="!!scope.row.roomId"
           >
             <p>
-              <i class="el-icon-warning"></i> 终止后系统将不会重新推流, 是否继续?
+              <i class="el-icon-warning"></i> 停止后系统将不会重新推流, 是否继续?
             </p>
             <div style="text-align: right; margin-top:8px;">
               <el-button type="primary" size="mini" @click="stopTask(scope.$index, scope.row)">继续</el-button>
             </div>
-            <el-button slot="reference" size="mini" type="danger">终止</el-button>
+            <el-button
+              slot="reference"
+              size="mini"
+              type="danger"
+              v-loading="loading"
+              :disabled="loading"
+            >停止</el-button>
           </el-popover>
         </template>
       </el-table-column>
@@ -89,6 +95,15 @@
         </el-form-item>
         <el-form-item label="其他设置" label-width="100px">
           <el-checkbox v-model="editItem.needRecord">直播后保存录像</el-checkbox>
+          <el-button
+            v-if="account.admin"
+            v-loading="loading"
+            :disabled="loading"
+            style="margin-left:15px;"
+            type="danger"
+            size="small"
+            @click="terminateTask(editItem.videoId)"
+          >终止推流任务</el-button>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -306,6 +321,7 @@ export default {
     },
     stopTask(index, row) {
       let apiUrl = "/api/broadcast/stopTask.json?videoId=" + row.videoId;
+      this.loading = true;
       this.$http.get(apiUrl).then(
         function(response) {
           // 这里是处理正确的回调
@@ -389,6 +405,47 @@ export default {
                 message: "推流任务创建成功",
                 type: "success"
               });
+              this.taskList();
+            } else {
+              this.$message.error(response.data.message);
+              this.loading = false;
+            }
+          },
+          function(response) {
+            if (response.status === 401) {
+              this.$router.push({ path: "/login" });
+            }
+            this.$message.error("请求失败");
+            this.loading = false;
+          }
+        );
+      });
+    },
+    terminateTask(videoId) {
+      this.$confirm(
+        <span>
+        此操作将把该推流任务从列表中删除并终止所有相关活动（包括录像）, 是否继续?
+        <br/><br/>
+        * 完全终止一个推流任务可能需要花费较多的时间，请耐心等待操作完成
+        </span>,
+        "操作确认",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        }
+      ).then(() => {
+        this.loading = true;
+        let apiUrl = "/api/broadcast/terminateTask.json?videoId=" + videoId;
+        this.$http.get(apiUrl).then(
+          function(response) {
+            // 这里是处理正确的回调
+            if (response.data.code === 0) {
+              this.$message({
+                message: "推流任务已被终止",
+                type: "success"
+              });
+              this.editVisible = false;
               this.taskList();
             } else {
               this.$message.error(response.data.message);
