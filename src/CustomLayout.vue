@@ -13,7 +13,7 @@
             <input
               type="file"
               ref="imageSelecter"
-              accept="image/*"
+              accept="image/png,image/jpeg"
               v-show="false"
               @change="addImageLayout"
             >
@@ -147,7 +147,7 @@
         ></div>
         <div
           v-if="layout.type == 'BlurLayout'"
-          :style="`width:100%;height:100%;background-image:url('${$refs.bg.src}');background-position:${0-layout.x}px ${0-layout.y}px;filter: blur(${cropConf.blurSize}px);`"
+          :style="`width:100%;height:100%;background-image:url('${backgroundImageSrc}');background-position:${0-layout.x}px ${0-layout.y}px;filter: blur(${cropConf.blurSize}px);`"
         ></div>
       </VueDragResize>
     </div>

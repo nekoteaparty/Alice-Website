@@ -12,6 +12,14 @@
     </a>
     <hr>
     <PagedTable :tableData="tableData" :tableHeader="tableHeader" :loading="loading">
+      <el-table-column label="推流健康度">
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.health === 0" disable-transitions type="info">未知</el-tag>
+          <el-tag v-if="scope.row.health >= 98" disable-transitions type="success">优秀({{scope.row.health.toFixed(1)}})</el-tag>
+          <el-tag v-if="scope.row.health >= 93 && scope.row.health < 98" disable-transitions type="warning">一般({{scope.row.health.toFixed(1)}})</el-tag>
+          <el-tag v-if="scope.row.health > 0 && scope.row.health < 93" disable-transitions type="danger">极差({{scope.row.health.toFixed(1)}})</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" width="200px">
         <template slot-scope="scope">
           <el-button size="mini" @click="showDetail(scope.$index, scope.row)">详情</el-button>
@@ -70,7 +78,12 @@
         <el-button type="primary" size="medium" @click="detailVisible = false">确 定</el-button>
       </span>
     </el-dialog>
-    <el-dialog title="推流管理" :visible.sync="editVisible" width="550px">
+    <el-dialog
+      title="推流管理"
+      :visible.sync="editVisible"
+      width="550px"
+      @close="editItem = {cropConf:{}}"
+    >
       <el-form label-position="right" :model="editItem">
         <el-form-item label="自主规制" label-width="100px">
           <el-button
