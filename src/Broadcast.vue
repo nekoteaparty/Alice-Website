@@ -12,7 +12,7 @@
     </a>
     <hr>
     <PagedTable :tableData="tableData" :tableHeader="tableHeader" :loading="loading">
-      <el-table-column label="推流健康度">
+      <el-table-column label="推流健康度" width="90">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.health === 0" disable-transitions type="info">未知</el-tag>
           <el-tag v-if="scope.row.health >= 98" disable-transitions type="success">优秀({{scope.row.health.toFixed(1)}})</el-tag>
