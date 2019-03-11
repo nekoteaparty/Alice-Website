@@ -12,6 +12,7 @@
     "postcss-import": "^12.0.1",
     "postcss-url": "^8.0.0",
     "vue": "^2.5.16",
+    "vue-drag-resize": "^1.3.2",
     "vue-m-crop": "git+https://github.com/NekoSunflower/m-crop.git",
     "vue-resource": "^1.5.1",
     "vue-router": "^3.0.1"

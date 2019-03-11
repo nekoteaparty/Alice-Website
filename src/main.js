@@ -4,12 +4,10 @@ import 'element-ui/lib/theme-chalk/index.css'
 import App from './App.vue'
 import VueResource from 'vue-resource'
 import VueRouter from "vue-router";
-import MCrop from 'vue-m-crop';
 
 Vue.use(VueRouter);
 Vue.use(VueResource);
 Vue.use(ElementUI);
-Vue.use(MCrop);
 
 // 创建一个路由器实例
 // 并且配置路由规则

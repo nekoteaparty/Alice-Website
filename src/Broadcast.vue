@@ -12,6 +12,14 @@
     </a>
     <hr>
     <PagedTable :tableData="tableData" :tableHeader="tableHeader" :loading="loading">
+      <el-table-column label="推流健康度" width="90">
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.health === 0" disable-transitions type="info">未知</el-tag>
+          <el-tag v-if="scope.row.health >= 98" disable-transitions type="success">优秀({{scope.row.health.toFixed(1)}})</el-tag>
+          <el-tag v-if="scope.row.health >= 93 && scope.row.health < 98" disable-transitions type="warning">一般({{scope.row.health.toFixed(1)}})</el-tag>
+          <el-tag v-if="scope.row.health > 0 && scope.row.health < 93" disable-transitions type="danger">极差({{scope.row.health.toFixed(1)}})</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" width="200px">
         <template slot-scope="scope">
           <el-button size="mini" @click="showDetail(scope.$index, scope.row)">详情</el-button>
@@ -70,7 +78,12 @@
         <el-button type="primary" size="medium" @click="detailVisible = false">确 定</el-button>
       </span>
     </el-dialog>
-    <el-dialog title="推流管理" :visible.sync="editVisible" width="550px">
+    <el-dialog
+      title="推流管理"
+      :visible.sync="editVisible"
+      width="550px"
+      @close="editItem = {cropConf:{}}"
+    >
       <el-form label-position="right" :model="editItem">
         <el-form-item label="自主规制" label-width="100px">
           <el-button
@@ -121,9 +134,9 @@
         <el-radio v-model="editItem.cropConf.videoBannedType" label="FULL_SCREEN">全屏</el-radio>
         <el-radio
           v-model="editItem.cropConf.videoBannedType"
-          label="AREA_SCREEN"
+          label="CUSTOM_SCREEN"
           v-if="account.vip"
-        >区域</el-radio>
+        >自定义</el-radio>
       </el-radio-group>
       <el-tag
         v-if="!account.vip"
@@ -132,33 +145,12 @@
         color="#fff"
         style="border:none"
         class="el-icon-info"
-      >&nbsp;如需区域打码，请加QQ群936618172联系群主。</el-tag>
-      <template v-if="editItem.cropConf.videoBannedType == 'AREA_SCREEN'">
-        <div style="display:inline-block;margin-left:20px;">
-          <label>模糊强度:</label>
-          <el-slider
-            v-model="editItem.cropConf.blurSize"
-            :min="0"
-            :max="5"
-            style="width:120px;display:inline-block;vertical-align: middle;margin-left:10px;"
-            @change="onBlurSizeChange"
-          ></el-slider>
-        </div>
-      </template>
-      <m-crop
-        style="margin-top:10px;"
-        v-if="editItem.cropConf.videoBannedType == 'AREA_SCREEN'"
-        ref="crop"
-        :src="`/api/keyframe/${editItem.videoId}?_t=${new Date().getTime()}`"
-        :auto="true"
-        :show-view="true"
-        :show-ctrl="true"
-        :ctrl-width="cropConf.ctrlWidth * 0.66667"
-        :ctrl-height="cropConf.ctrlHeight * 0.66667"
-        :ctrl-left="cropConf.ctrlLeft * 0.66667"
-        :ctrl-top="cropConf.ctrlTop * 0.66667"
-        @stop="onCrop"
-      ></m-crop>
+      >&nbsp;如需自定义打码，请加QQ群936618172联系群主。</el-tag>
+      <CustomLayout
+        v-if="editItem.cropConf.videoBannedType == 'CUSTOM_SCREEN'"
+        :cropConf="editItem.cropConf"
+        :backgroundImageSrc="`/api/keyframe/${editItem.videoId}?_t=${parseInt(new Date().getTime() / 100000)}`"
+      ></CustomLayout>
       <span slot="footer" class="dialog-footer">
         <el-button
           type="primary"
@@ -182,25 +174,13 @@
   color: #606266;
   cursor: default;
 }
-
-.cut-box {
-  max-width: none;
-  max-height: none;
-  min-width: auto;
-}
-
-.cut-box .cut-shade {
-  background: none;
-}
-.cut-box .cut-view {
-  background: none;
-}
 </style>
 
 
 <script>
 import PagedTable from "./PagedTable.vue";
 import AreaSelector from "./AreaSelector.vue";
+import CustomLayout from "./CustomLayout.vue";
 export default {
   data() {
     return {
@@ -249,31 +229,11 @@ export default {
         }
       );
     },
-    onBlurSizeChange() {
-      if (this.$refs[`crop`]) {
-        this.$refs[`crop`].$refs[`view-img`].style["filter"] =
-          "blur(" + this.editItem.cropConf.blurSize + "px)";
-      }
-    },
-    onCrop(e) {
-      var img = e.img;
-      var scale = img.naturalHeight / e.height;
-      this.cropConf.ctrlTop = e.clipTop * scale;
-      this.cropConf.ctrlLeft = e.clipLeft * scale;
-      this.cropConf.ctrlWidth = e.clipWidth * scale;
-      this.cropConf.ctrlHeight = e.clipHeight * scale;
-      console.log(this.cropConf);
-    },
     cropConfSave() {
       let apiUrl =
         "/api/broadcast/cropConfSave.json?videoId=" + this.editItem.videoId;
-      if (this.$refs[`crop`]) {
-        var cutInfo = this.$refs[`crop`].getCutInfo();
-        var scale = cutInfo.img.naturalHeight / cutInfo.height;
-        this.editItem.cropConf.ctrlTop = cutInfo.clipTop * scale;
-        this.editItem.cropConf.ctrlLeft = cutInfo.clipLeft * scale;
-        this.editItem.cropConf.ctrlWidth = cutInfo.clipWidth * scale;
-        this.editItem.cropConf.ctrlHeight = cutInfo.clipHeight * scale;
+      if (this.editItem.cropConf.videoBannedType != "CUSTOM_SCREEN") {
+        this.editItem.cropConf.layouts = new Array();
       }
       this.$http.post(apiUrl, this.editItem.cropConf).then(
         function(response) {
@@ -424,9 +384,10 @@ export default {
     terminateTask(videoId) {
       this.$confirm(
         <span>
-        此操作将把该推流任务从列表中删除并终止所有相关活动（包括录像）, 是否继续?
-        <br/><br/>
-        * 完全终止一个推流任务可能需要花费较多的时间，请耐心等待操作完成
+          此操作将把该推流任务从列表中删除并终止所有相关活动（包括录像）,
+          是否继续?
+          <br />
+          <br />* 完全终止一个推流任务可能需要花费较多的时间，请耐心等待操作完成
         </span>,
         "操作确认",
         {
@@ -463,7 +424,7 @@ export default {
       });
     }
   },
-  components: { PagedTable, AreaSelector },
+  components: { PagedTable, AreaSelector, CustomLayout },
   created() {
     this.taskList();
   },
