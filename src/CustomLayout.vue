@@ -13,7 +13,7 @@
             <input
               type="file"
               ref="imageSelecter"
-              accept="image/png,image/jpeg"
+              accept="image/png, image/jpeg"
               v-show="false"
               @change="addImageLayout"
             >
@@ -129,12 +129,13 @@
         :parentLimitation="false"
         @dragging="setRect($event,layout)"
         @resizing="setRect($event,layout)"
+        :class="`${activatedLayout == layout ? 'current' : ''}`"
         :style="`${activatedLayout == layout ? 'box-shadow: rgb(137, 255, 0) 0px 0px 15px; outline:1px solid rgb(137, 255, 0);' : ''}`"
       >
         <iframe
           v-if="layout.type == 'DanmakuLayout'"
           :style="`background:none;border:none;width:100%;height:100%;opacity:${layout.opacity}`"
-          :src="`${layout.src}&zoom=${layout.zoom * 0.66406}`"
+          :src="`${layout.src}&zoom=${layout.zoom}`"
         ></iframe>
         <img
           v-if="layout.type == 'ImageLayout'"
@@ -155,6 +156,21 @@
 </template>
 
 <style>
+.vdr-stick {
+  transform: scale(1.5);
+  border-radius: 50%;
+  opacity: 0.3;
+}
+
+.current .vdr-stick {
+  opacity: 1;
+}
+
+.custom-layout-root {
+  position: relative;
+  height: 505px;
+}
+
 .custom-layout-toolbar {
   margin: 5px 0;
 }
@@ -166,8 +182,9 @@
 
 .custom-layout {
   overflow: hidden;
-  position: relative;
-  zoom: 66.406%;
+  position: absolute;
+  transform: scale(0.66406);
+  transform-origin: 0 0;
 }
 </style>
 
