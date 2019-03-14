@@ -47,7 +47,12 @@
       <span class="label-username" slot="prepend">用户名</span>
       <el-input type="password" v-model="password" slot="append">
         <template slot="prepend">密&nbsp;&nbsp;码</template>
-        <el-button type="primary" slot="append" @click="login" v-loading.fullscreen.lock="loading">登录</el-button>
+        <el-button
+          type="primary"
+          slot="append"
+          @click="login"
+          v-loading.fullscreen.lock="loading"
+        >登录</el-button>
       </el-input>
     </el-input>
     <el-tag
@@ -65,10 +70,19 @@
         <el-button type="primary" @click="showCookiesTip=false">确 定</el-button>
       </span>
     </el-dialog>
+    <img class="alice" src="./assets/alice_half_body.jpg">
   </div>
 </template>
 
 <style>
+img.alice {
+    position: fixed;
+    top: 60%;
+    left: 50%;
+    margin-left: -290px;
+    z-index: -1;
+}
+
 .login-center {
   width: 640px;
   height: 320px;
@@ -124,7 +138,6 @@
 .captcha-prompt * {
   vertical-align: middle;
 }
-
 </style>
 
 <script>
@@ -175,7 +188,7 @@ export default {
               );
               this.$router.push({ path: "/main/broadcast" });
             } else {
-              if(response.data.code === -101){
+              if (response.data.code === -101) {
                 this.$prompt(
                   <p class="captcha-prompt">
                     <span>请输入验证码</span>
@@ -197,10 +210,12 @@ export default {
                     inputPattern: /.+/,
                     inputErrorMessage: "请输入验证码"
                   }
-                ).then(({ value }) => {
-                  this.captcha = value;
-                  this.login();
-                }).catch(() => {});
+                )
+                  .then(({ value }) => {
+                    this.captcha = value;
+                    this.login();
+                  })
+                  .catch(() => {});
               }
               this.$message.error(response.data.message);
             }
