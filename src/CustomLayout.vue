@@ -205,8 +205,8 @@ export default {
       let customLayout = {
         x: 0,
         y: 0,
-        width: 100,
-        height: 100,
+        width: 250,
+        height: 250,
         index: 1000,
         type: type,
         opacity: 1
@@ -250,6 +250,7 @@ export default {
           return;
       }
       this.layouts.push(customLayout);
+      this.activatedLayout = customLayout;
     },
     addImageLayout(e) {
       let that = this;
