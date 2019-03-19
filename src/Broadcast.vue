@@ -39,7 +39,7 @@
             size="mini"
             style="margin-left: 0px;"
             type="primary"
-            @click="editVisible = true, editItem = scope.row"
+            @click="editVisible = true, editItem = scope.row, editItem.cropConf = {}"
           >管理</el-button>
           <el-button
             size="mini"
@@ -94,14 +94,16 @@
       title="推流管理"
       :visible.sync="editVisible"
       width="550px"
-      @close="editItem = {cropConf:{}}"
+      @close="editItem = {cropConf: {}}"
     >
       <el-form label-position="right" :model="editItem">
         <el-form-item label-width="50px">
           <el-button
             type="primary"
             size="small"
-            @click="blurSize = editItem.cropConf.blurSize, cropConf = JSON.parse(JSON.stringify(editItem.cropConf)), videoManagerVisible = true"
+            v-loading="loading"
+            :disabled="loading"
+            @click="getCropConf(editItem.videoId)"
           >视频内容规制</el-button>
           <el-checkbox style="margin-left:30px;" v-model="editItem.audioBanned">强制单声道</el-checkbox>
           <el-checkbox v-model="editItem.vertical">竖屏直播</el-checkbox>
@@ -141,6 +143,7 @@
       :visible.sync="videoManagerVisible"
       width="890px"
       :close-on-click-modal="false"
+      @close="editItem.cropConf = {}"
     >
       <el-radio-group v-model="editItem.cropConf.videoBannedType">
         <el-radio v-model="editItem.cropConf.videoBannedType" label="NONE">取消内容规制</el-radio>
@@ -168,7 +171,9 @@
         <el-button
           type="primary"
           size="medium"
-          @click="cropConfSave(), videoManagerVisible = false"
+          @click="cropConfSave()"
+          v-loading="loading"
+          :disabled="loading"
         >保 存</el-button>
       </span>
     </el-dialog>
@@ -211,9 +216,7 @@ export default {
       detailVisible: false,
       detailItem: {},
       editVisible: false,
-      editItem: {
-        cropConf: {}
-      },
+      editItem: { cropConf: {} },
       cropConf: {},
       blurSize: 0,
       videoManagerVisible: false
@@ -242,7 +245,34 @@ export default {
         }
       );
     },
+    getCropConf(videoId) {
+      this.loading = true;
+      this.$http.get("/api/broadcast/getCropConf.json?videoId=" + videoId).then(
+        function(response) {
+          // 这里是处理正确的回调
+          if (response.data.code === 0) {
+            this.editItem = Object.assign({}, this.editItem, {
+              cropConf: response.data.data
+            });
+            this.cropConf = JSON.parse(JSON.stringify(this.editItem.cropConf));
+            this.blurSize = this.editItem.cropConf.blurSize;
+            this.videoManagerVisible = true;
+          } else {
+            this.$message.error(response.data.message);
+          }
+          this.loading = false;
+        },
+        function(response) {
+          if (response.status === 401) {
+            this.$router.push({ path: "/login" });
+          }
+          this.$message.error("请求失败");
+          this.loading = false;
+        }
+      );
+    },
     cropConfSave() {
+      this.loading = true;
       let apiUrl =
         "/api/broadcast/cropConfSave.json?videoId=" + this.editItem.videoId;
       if (this.editItem.cropConf.videoBannedType != "CUSTOM_SCREEN") {
@@ -256,6 +286,7 @@ export default {
               message: "自主规制配置保存成功",
               type: "success"
             });
+            this.videoManagerVisible = false;
             this.taskList();
           } else {
             this.$message.error(response.data.message);
