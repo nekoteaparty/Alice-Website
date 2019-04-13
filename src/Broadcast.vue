@@ -153,6 +153,7 @@
           label="CUSTOM_SCREEN"
           v-if="account.vip"
         >自定义</el-radio>
+        <el-checkbox style="margin-left:15px;" v-if="editItem.cropConf.videoBannedType == 'CUSTOM_SCREEN'" v-model="editItem.cropConf.autoBlur">自动评论区打码</el-checkbox>
       </el-radio-group>
       <el-tag
         v-if="!account.vip"
