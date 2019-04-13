@@ -4,7 +4,8 @@
       <div class="side-logo"></div>
       <a href="https://afdian.net/@aliceliveman" class="patron" target="_black">
         <img src="./assets/mea.png" class="mea" width="60" height="60">
-        <span>你好，
+        <span>
+          你好，
           <br>我很可爱！
         </span>
       </a>
@@ -75,6 +76,15 @@
               ></path>
             </svg>
             <span>转播服务器管理</span>
+          </el-menu-item>
+          <el-menu-item v-if="account.admin" index="/main/externalApp">
+            <svg aria-hidden="true" viewBox="0 0 512 512" version="1.1" width="16" height="16">
+              <path
+                fill="currentColor"
+                d="M512 176.001C512 273.203 433.202 352 336 352c-11.22 0-22.19-1.062-32.827-3.069l-24.012 27.014A23.999 23.999 0 0 1 261.223 384H224v40c0 13.255-10.745 24-24 24h-40v40c0 13.255-10.745 24-24 24H24c-13.255 0-24-10.745-24-24v-78.059c0-6.365 2.529-12.47 7.029-16.971l161.802-161.802C163.108 213.814 160 195.271 160 176 160 78.798 238.797.001 335.999 0 433.488-.001 512 78.511 512 176.001zM336 128c0 26.51 21.49 48 48 48s48-21.49 48-48-21.49-48-48-48-48 21.49-48 48z"
+              ></path>
+            </svg>
+            <span>外部服务授权管理</span>
           </el-menu-item>
         </el-menu>
       </el-aside>

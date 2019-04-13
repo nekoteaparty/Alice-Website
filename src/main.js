@@ -18,6 +18,8 @@ import Account from './Account.vue'
 import System from './System.vue'
 import Login from "./Login.vue";
 import Server from "./Server.vue";
+import ExternalApp from "./ExternalApp.vue";
+import DDPlayer from "./DDPlayer.vue";
 const router = new VueRouter({
   mode: 'history',
   base: __dirname,
@@ -50,6 +52,10 @@ const router = new VueRouter({
           component: Server,
           name: "转播服务器管理"
         }, {
+          path: "externalApp",
+          component: ExternalApp,
+          name: "外部服务授权管理"
+        }, {
           path: "",
           component: Broadcast
         }
@@ -62,6 +68,10 @@ const router = new VueRouter({
     {
       path: '/',
       redirect: 'login'
+    },
+    {
+      path: '/ddplayer',
+      component: DDPlayer
     }
   ]
 })
