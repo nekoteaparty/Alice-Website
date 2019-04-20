@@ -19,7 +19,7 @@
             >
           </el-dropdown-item>
           <el-dropdown-item command="DanmakuLayout">B站直播间弹幕</el-dropdown-item>
-          <el-dropdown-item command="BlurLayout">高斯模糊滤镜</el-dropdown-item>
+          <el-dropdown-item command="RectangleBlurLayout">高斯模糊滤镜</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
       <template v-if="activatedLayout.type == 'DanmakuLayout'">
@@ -46,7 +46,7 @@
           ></el-slider>
         </div>
       </template>
-      <template v-if="activatedLayout.type == 'BlurLayout'">
+      <template v-if="activatedLayout.type == 'RectangleBlurLayout'">
         <div style="display:inline-block;margin-right:10px;">
           <label>模糊强度:</label>
           <el-slider
@@ -115,9 +115,10 @@
       >
       <VueDragResize
         v-for="(layout, index) in layouts"
+        :draggable="layout.type == 'ImageSegmentBlurLayout'"
         :parentScaleX="0.66406"
         :parentScaleY="0.66406"
-        :isActive="true"
+        :isActive="layout.type != 'ImageSegmentBlurLayout'"
         :key="index"
         :w="layout.width"
         :h="layout.height"
@@ -130,7 +131,7 @@
         @dragging="setRect($event,layout)"
         @resizing="setRect($event,layout)"
         :class="`${activatedLayout == layout ? 'current' : ''}`"
-        :style="`${activatedLayout == layout ? 'box-shadow: rgb(137, 255, 0) 0px 0px 15px; outline:1px solid rgb(137, 255, 0);' : ''}`"
+        :style="`${activatedLayout == layout ? 'box-shadow: rgb(137, 255, 0) 0px 0px 15px; outline:1px solid rgb(137, 255, 0);' : ';'}${layout.type == 'ImageSegmentBlurLayout' ? 'user-select: none; pointer-events: none;' : ';'}`"
       >
         <iframe
           v-if="layout.type == 'DanmakuLayout'"
@@ -147,8 +148,13 @@
           :style="`width:100%;height:100%;opacity:${layout.opacity};background-color:${layout.hexColor};border-radius:${layout.radiusPercentW / 2}% / ${layout.radiusPercentH / 2}%;`"
         ></div>
         <div
-          v-if="layout.type == 'BlurLayout'"
+          v-if="layout.type == 'RectangleBlurLayout'"
           :style="`width:100%;height:100%;background-image:url('${backgroundImageSrc}');background-position:${0-layout.x}px ${0-layout.y}px;filter: blur(${cropConf.blurSize}px);`"
+        ></div>
+        <div
+          v-if="layout.type == 'ImageSegmentBlurLayout'"
+          :style="`background:url(${backgroundImageSrc});border:none;width:100%;height:100%;user-select: none; pointer-events: none;mask-size:cover;mask-image:url(${layout.imageBase64});`"
+          draggable="false"
         ></div>
       </VueDragResize>
     </div>
@@ -240,7 +246,7 @@ export default {
           customLayout.rgba = "rgba(0,0,0,1)";
           customLayout.hexColor = "#000000";
           break;
-        case "BlurLayout":
+        case "RectangleBlurLayout":
           customLayout.index = 1;
           if (this.cropConf.blurSize == 0) {
             this.cropConf.blurSize = 3;
