@@ -83,6 +83,7 @@
           <el-checkbox v-model="channelInfo.autoBalance">允许推流调配</el-checkbox>
           <el-checkbox v-model="channelInfo.needRecord">自动开启录像</el-checkbox>
           <el-checkbox v-model="channelInfo.defaultCropConf.autoBlur">自动评论区打码</el-checkbox>
+          <el-checkbox v-model="channelInfo.defaultCropConf.autoImageSegment">自动分离人物形象</el-checkbox>
           <el-tooltip
             class="item"
             effect="dark"
@@ -129,6 +130,7 @@
           >
             <i class="el-icon-warning"></i>
           </el-tooltip>
+          <el-checkbox v-model="channelInfo.defaultCropConf.autoImageSegment">自动分离人物形象</el-checkbox>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
