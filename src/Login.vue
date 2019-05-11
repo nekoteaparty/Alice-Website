@@ -212,7 +212,7 @@ export default {
                   }
                 )
                   .then(({ value }) => {
-                    this.captcha = value;
+                    this.captcha = value.toUpperCase();
                     this.login();
                   })
                   .catch(() => {});

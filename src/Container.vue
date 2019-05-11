@@ -21,7 +21,8 @@
           @click="charge"
           style="color:#409EFF"
           class="el-icon-circle-plus"
-        ></a>
+        ></a>&nbsp;
+        <a href="javascript:" @click="billList">账单</a>
       </span>
       &nbsp;&nbsp;
       <a href="javascript:" title="登出" @click="logout" style="color:#333;">
@@ -33,6 +34,9 @@
         </svg>
       </a>
     </el-header>
+    <el-dialog title="账单" :visible.sync="billListVisible">
+      <PagedTable :tableData="tableData" :tableHeader="tableHeader" :loading="loading"></PagedTable>
+    </el-dialog>
     <el-container style="background:#333;height: 100%;">
       <el-aside width="200px">
         <el-menu
@@ -239,10 +243,19 @@ svg {
 </style>
 
 <script>
+import PagedTable from "./PagedTable.vue";
 export default {
   data() {
     return {
       account: JSON.parse(sessionStorage.getItem("account")),
+      tableData: [],
+      tableHeader: [
+        { prop: "recordDate", label: "记录时间", width: "250px" },
+        { prop: "pointChange", label: "AP点数变动", width: "150px" },
+        { prop: "remark", label: "描述" }
+      ],
+      loading: false,
+      billListVisible: false,
       breadcrumb: "",
       cards: ""
     };
@@ -254,6 +267,7 @@ export default {
           // 这里是处理正确的回调
           if (response.data.code === 0) {
             sessionStorage.clear();
+            window.clearInterval(interval);
             this.$router.push({ path: "/login" });
           } else {
             this.$message.error(response.data.message);
@@ -309,8 +323,32 @@ export default {
           }
         );
       });
+    },
+    billList() {
+      this.loading = true;
+      this.billListVisible = true;
+      this.$http.get("/api/account/billList.json").then(
+        function(response) {
+          // 这里是处理正确的回调
+          if (response.data.code === 0) {
+            this.tableData = [];
+            this.tableData = response.data.data;
+          } else {
+            this.$message.error(response.data.message);
+          }
+          this.loading = false;
+        },
+        function(response) {
+          if (response.status === 401) {
+            this.$router.push({ path: "/login" });
+          }
+          this.$message.error("请求失败");
+          this.loading = false;
+        }
+      );
     }
   },
+  components: { PagedTable },
   created() {
     window.clearInterval(window.interval);
     let $ = this;
@@ -331,6 +369,10 @@ export default {
         function(response) {
           if (response.status === 401) {
             this.$router.push({ path: "/login" });
+            this.$confirm("您的登录已失效，请重新登录！", "提示", {
+              showCancelButton: false,
+              type: "info"
+            });
             window.clearInterval(interval);
           }
         }

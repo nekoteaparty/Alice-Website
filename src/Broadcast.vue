@@ -168,10 +168,11 @@
         v-model="editItem.cropConf.broadcastResolution"
         placeholder="请选择转播分辨率"
       >
-        <el-option label="1080P@30FPS 价格:30AP/小时" value="R1080F30"></el-option>
-        <el-option label="720P@60FPS 价格:30AP/小时" value="R720F60"></el-option>
-        <el-option label="720P@30FPS 价格:7AP/小时" value="R720F30"></el-option>
         <el-option label="480P@30FPS 价格:7AP/小时" value="R480F30"></el-option>
+        <el-option label="720P@30FPS 价格:7AP/小时" value="R720F30"></el-option>
+        <el-option label="720P@60FPS 价格:30AP/小时" value="R720F60"></el-option>
+        <el-option label="1080P@30FPS 价格:30AP/小时" value="R1080F30"></el-option>
+        <el-option label="*1080P@60FPS 价格:30AP/小时" value="R1080F60"></el-option>
       </el-select>
       <CustomLayout
         v-if="editItem.cropConf.videoBannedType == 'CUSTOM_SCREEN'"
@@ -289,7 +290,29 @@ export default {
           type: "error"
         });
         return;
+      } else if (this.editItem.cropConf.broadcastResolution == "R1080F60") {
+        this.$confirm(
+          <p>
+            您选择了1080P@60FPS转播分辨率，该分辨率下部分视频流无法达到流畅观看的性能要求，是否继续保存？
+            <br />
+            <b>提示：使用自定义图片、矩形（圆角矩形）代替高斯模糊可以有效降低性能需求。</b>
+          </p>,
+          "性能警告",
+          {
+            confirmButtonText: "继续",
+            cancelButtonText: "取消",
+            type: "warning"
+          }
+        )
+          .then(() => {
+            this.doCropConfSave();
+          })
+          .catch(() => {});
+      } else {
+        this.doCropConfSave();
       }
+    },
+    doCropConfSave() {
       this.loading = true;
       let apiUrl =
         "/api/broadcast/cropConfSave.json?videoId=" + this.editItem.videoId;
