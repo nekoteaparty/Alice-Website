@@ -15,6 +15,7 @@
       <el-table-column label="推流健康度" width="106">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.health === 0" disable-transitions type="info">未知</el-tag>
+          <el-tag v-if="scope.row.health === -1" disable-transitions type="info">初始化</el-tag>
           <el-tag
             v-if="scope.row.health >= 98"
             disable-transitions
@@ -148,21 +149,30 @@
       <el-radio-group v-model="editItem.cropConf.videoBannedType">
         <el-radio v-model="editItem.cropConf.videoBannedType" label="NONE">取消内容规制</el-radio>
         <el-radio v-model="editItem.cropConf.videoBannedType" label="FULL_SCREEN">全屏</el-radio>
-        <el-radio
-          v-model="editItem.cropConf.videoBannedType"
-          label="CUSTOM_SCREEN"
-        >自定义</el-radio>
-        <el-checkbox style="margin-left:15px;" v-if="editItem.cropConf.videoBannedType == 'CUSTOM_SCREEN'" v-model="editItem.cropConf.autoBlur">自动评论区打码</el-checkbox>
-        <el-checkbox style="margin-left:15px;" v-if="editItem.cropConf.videoBannedType == 'CUSTOM_SCREEN'" v-model="editItem.cropConf.autoImageSegment">自动分离人物形象</el-checkbox>
+        <el-radio v-model="editItem.cropConf.videoBannedType" label="CUSTOM_SCREEN">自定义</el-radio>
       </el-radio-group>
-      <el-tag
-        v-if="!account.vip"
-        type="info"
-        disable-transitions
-        color="#fff"
-        style="border:none"
-        class="el-icon-info"
-      >&nbsp;如需自定义打码，请加QQ群936618172联系群主。</el-tag>
+      <el-checkbox
+        style="margin-left:15px;"
+        v-if="editItem.cropConf.videoBannedType == 'CUSTOM_SCREEN'"
+        v-model="editItem.cropConf.autoBlur"
+      >自动评论区打码</el-checkbox>
+      <el-checkbox
+        style="margin-left:15px;"
+        v-if="editItem.cropConf.videoBannedType == 'CUSTOM_SCREEN'"
+        v-model="editItem.cropConf.autoImageSegment"
+      >自动分离人物形象</el-checkbox>
+      <el-select
+        v-if="editItem.cropConf.videoBannedType == 'CUSTOM_SCREEN'"
+        style="margin-left:15px;width:240px"
+        size="small"
+        v-model="editItem.cropConf.broadcastResolution"
+        placeholder="请选择转播分辨率"
+      >
+        <el-option label="1080P@30FPS 价格:30AP/小时" value="R1080F30"></el-option>
+        <el-option label="720P@60FPS 价格:30AP/小时" value="R720F60"></el-option>
+        <el-option label="720P@30FPS 价格:7AP/小时" value="R720F30"></el-option>
+        <el-option label="480P@30FPS 价格:7AP/小时" value="R480F30"></el-option>
+      </el-select>
       <CustomLayout
         v-if="editItem.cropConf.videoBannedType == 'CUSTOM_SCREEN'"
         :cropConf="editItem.cropConf"
@@ -273,6 +283,13 @@ export default {
       );
     },
     cropConfSave() {
+      if (!this.editItem.cropConf.broadcastResolution) {
+        this.$confirm("请选择转播分辨率", "提示", {
+          showCancelButton: false,
+          type: "error"
+        });
+        return;
+      }
       this.loading = true;
       let apiUrl =
         "/api/broadcast/cropConfSave.json?videoId=" + this.editItem.videoId;

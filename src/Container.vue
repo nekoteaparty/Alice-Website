@@ -14,6 +14,16 @@
       </a>
       <!-- <a href="https://www.vultr.com/?ref=7654882" class="patron" target="_black" ><img src="./assets/vultr.png" height="54"></a> -->
       <span>{{account.nickname}}</span>
+      <span>
+        &nbsp;AP:{{account.point}}
+        <a
+          href="javascript:"
+          @click="charge"
+          style="color:#409EFF"
+          class="el-icon-circle-plus"
+        ></a>
+      </span>
+      &nbsp;&nbsp;
       <a href="javascript:" title="登出" @click="logout" style="color:#333;">
         <svg viewBox="0 0 512 512" version="1.1" width="16" height="16" aria-hidden="true">
           <path
@@ -233,7 +243,8 @@ export default {
   data() {
     return {
       account: JSON.parse(sessionStorage.getItem("account")),
-      breadcrumb: ""
+      breadcrumb: "",
+      cards: ""
     };
   },
   methods: {
@@ -252,7 +263,79 @@ export default {
           this.$message.error("请求失败");
         }
       );
+    },
+    charge() {
+      this.$prompt(
+        <div>
+          请将卡号直接复制到输入框中，多个卡号请换行分隔
+          <a
+            style="position:absolute;bottom:-28px;left:15px;"
+            target="_blank"
+            href="/api/system/apShop"
+          >
+            点击此处购买卡密
+          </a>
+        </div>,
+        "AP点数充值",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          inputType: "textarea"
+        }
+      ).then(({ value }) => {
+        let formData = new FormData();
+        formData.append("cards", value);
+        this.$http.post("/api/account/useCard.json", formData).then(
+          function(response) {
+            // 这里是处理正确的回调
+            if (response.data.code === 0) {
+              this.$confirm(
+                "你已成功充值" + response.data.data + "点AP！",
+                "提示",
+                {
+                  showCancelButton: false,
+                  type: "success"
+                }
+              );
+            } else {
+              this.$confirm(response.data.message, "操作失败", {
+                showCancelButton: false,
+                type: "error"
+              });
+            }
+          },
+          function(response) {
+            this.$message.error("请求失败");
+          }
+        );
+      });
     }
+  },
+  created() {
+    window.clearInterval(window.interval);
+    let $ = this;
+    window.interval = setInterval(function() {
+      $.$http.get("/api/account/info.json").then(
+        function(response) {
+          // 这里是处理正确的回调
+          if (response.data.code === 0) {
+            sessionStorage.setItem(
+              "account",
+              JSON.stringify(response.data.data)
+            );
+            this.account = response.data.data;
+          } else {
+            this.$message.error(response.data.message);
+          }
+        },
+        function(response) {
+          if (response.status === 401) {
+            this.$router.push({ path: "/login" });
+            window.clearInterval(interval);
+          }
+        }
+      );
+    }, 2000);
   }
 };
 </script>

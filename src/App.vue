@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <router-view></router-view>  
+    <router-view></router-view>
   </div>
 </template>
 
@@ -42,5 +42,9 @@ a {
 
 .od-config .el-message-box__input {
   padding-top: 0px;
+}
+
+.el-dialog__body {
+  padding: 20px 20px;
 }
 </style>

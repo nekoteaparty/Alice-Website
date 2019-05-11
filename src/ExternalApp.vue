@@ -38,15 +38,16 @@
         <el-form-item label="服务类型" label-width="120px" required>
           <el-select v-model="externalAppInfo.type" autocomplete="off">
             <el-option label="百度AIP" value="baidu"></el-option>
+            <el-option label="VULTR" value="vultr"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="应用ID" label-width="120px" required>
+        <el-form-item label="应用ID" label-width="120px">
           <el-input v-model="externalAppInfo.appId" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="应用秘钥" label-width="120px" required>
+        <el-form-item label="应用KEY" label-width="120px">
           <el-input v-model="externalAppInfo.appKey" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="安全秘钥" label-width="120px" required>
+        <el-form-item label="安全秘钥" label-width="120px">
           <el-input v-model="externalAppInfo.secretKey" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="可用调用次数" label-width="120px" required>
@@ -73,15 +74,16 @@
         <el-form-item label="服务类型" label-width="120px" required>
           <el-select v-model="externalAppInfo.type" autocomplete="off" :disabled="true">
             <el-option label="百度AIP" value="baidu"></el-option>
+            <el-option label="VULTR" value="vultr"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="应用ID" label-width="120px" required>
+        <el-form-item label="应用ID" label-width="120px">
           <el-input v-model="externalAppInfo.appId" autocomplete="off" :disabled="true"></el-input>
         </el-form-item>
-        <el-form-item label="应用秘钥" label-width="120px" required>
+        <el-form-item label="应用KEY" label-width="120px">
           <el-input v-model="externalAppInfo.appKey" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="安全秘钥" label-width="120px" required>
+        <el-form-item label="安全秘钥" label-width="120px">
           <el-input v-model="externalAppInfo.secretKey" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="可用调用次数" label-width="120px" required>
