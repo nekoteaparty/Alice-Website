@@ -11,6 +11,11 @@
     </el-popover>
     <hr/>
     <PagedTable :tableData="tableData" :tableHeader="tableHeader" :loading="loading">
+        <el-table-column label="AP点数" width="150px" v-if="account.admin">
+            <template slot-scope="scope">
+                {{scope.row.point}}
+            </template>
+        </el-table-column>
         <el-table-column label="允许推流调配" width="150px">
             <template slot-scope="scope">
                 <i class="el-icon-success" style="color:#67C23A" v-show="scope.row.joinAutoBalance"></i>
@@ -32,6 +37,7 @@
                     </div>
                     <el-button slot="reference" size="mini" type="danger">删除</el-button>
                 </el-popover>
+                <el-button size="mini" type="primary" @click="billList(scope.row.accountId, scope.$index)">账单</el-button>
             </template>
         </el-table-column>
     </PagedTable>
@@ -68,6 +74,10 @@
             <el-button type="primary" size="medium" @click="editAccount()">保 存</el-button>
         </span>
     </el-dialog>
+    <el-dialog :title="`${billAccountId}的账单`" :visible.sync="billListVisible">
+      <el-button size="mini" type="primary" @click="apPointChange(billAccountId)">AP点数变更</el-button>
+      <PagedTable :tableData="billTableData" :tableHeader="billTableHeader" :loading="loading"></PagedTable>
+    </el-dialog>
   </div>
 </template>
 
@@ -101,6 +111,14 @@ export default {
         { prop: "description", label: "描述" }
       ],
       loading: false,
+      billTableData: [],
+      billTableHeader: [
+        { prop: "recordDate", label: "记录时间", width: "250px" },
+        { prop: "pointChange", label: "AP点数变动", width: "150px" },
+        { prop: "remark", label: "描述" }
+      ],
+      billListVisible: false,
+      billAccountId: '',
       detailVisible: false,
       editVisible: false,
       addVisible: false,
@@ -130,6 +148,33 @@ export default {
           this.loading = false;
         }
       );
+    },
+    apPointChange(accountId) {
+      this.$prompt('请输入要变更的AP点数', 'AP点数变更', {
+          inputType:'number'
+        }).then(({ value }) => {
+          this.loading = true;
+          this.$http.post("/api/account/apPointChange.json?accountId=" + accountId + "&point=" + value).then(
+          function(response) {
+            // 这里是处理正确的回调
+            if (response.data.code === 0) {
+              this.$alert(<p>操作成功！<br/>{response.data.data}</p>, "提示", {
+                type: "success"
+              });
+              this.billList(accountId);
+            } else {
+              this.$message.error(response.data.message);
+              this.loading = false;
+            }
+          },
+          function(response) {
+            if (response.status === 401) {
+              this.$router.push({ path: "/login" });
+            }
+            this.$message.error("请求失败");
+            this.loading = false;
+          });
+        }).catch(() => {});
     },
     removeAccount(accountId, index) {
       let apiUrl = "/api/account/removeAccount.json?accountId=" + accountId;
@@ -203,6 +248,30 @@ export default {
         }
       );
     },
+    billList(accountId) {
+      this.loading = true;
+      this.billAccountId = accountId;
+      this.billListVisible = true;
+      this.$http.get("/api/account/billList.json?accountId=" + accountId).then(
+        function(response) {
+          // 这里是处理正确的回调
+          if (response.data.code === 0) {
+            this.billTableData = [];
+            this.billTableData = response.data.data;
+          } else {
+            this.$message.error(response.data.message);
+          }
+          this.loading = false;
+        },
+        function(response) {
+          if (response.status === 401) {
+            this.$router.push({ path: "/login" });
+          }
+          this.$message.error("请求失败");
+          this.loading = false;
+        }
+      );
+    },
     editAccount() {
       this.editVisible = false;
       this.loading = true;
@@ -230,6 +299,7 @@ export default {
           this.loading = false;
         }
       );
+      
     }
   },
   components: { PagedTable },
