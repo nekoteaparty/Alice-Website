@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-button v-if="!account.saved" type="primary" size="medium" icon="el-icon-plus" @click="accountInfo = { joinAutoBalance: false, postBiliDynamic: false, autoRoomTitle: false }, addVisible = true" :loading="loading">保存账户</el-button>
+    <el-button v-if="!account.saved" type="primary" size="medium" icon="el-icon-plus" @click="accountInfo = { joinAutoBalance: false, postBiliDynamic: false, autoRoomTitle: false, broadcastResolution: 'R720F30' }, addVisible = true" :loading="loading">保存账户</el-button>
     <el-button v-if="account.saved" size="medium" type="primary" icon="el-icon-edit" :loading="loading" @click="editVisible = true">账户设置</el-button>
     <el-popover v-if="account.saved" ref="removePopover" placement="bottom" width="200">
         <p><i class="el-icon-warning"></i> 账号删除后系统将中止正在进行的推流任务, 是否继续?</p>
@@ -41,12 +41,34 @@
             </template>
         </el-table-column>
     </PagedTable>
-    <el-dialog title="保存推流账户" :visible.sync="addVisible" width="40%">
+    <el-dialog title="保存推流账户" :visible.sync="addVisible" width="680px">
         <el-form :model="accountInfo">
-            <el-form-item label="账号描述" label-width="140px">            
+            <el-form-item label="账号描述" label-width="120px">            
               <el-input v-model="accountInfo.description" autocomplete="off"></el-input>
             </el-form-item>
-            <el-form-item label="推流设置" label-width="140px">            
+            <el-form-item label="默认转播分辨率" label-width="120px">            
+              <el-select
+                size="small"
+                v-model="accountInfo.broadcastResolution"
+                placeholder="请选择转播分辨率"
+              >
+                <el-option label="480P@30FPS 价格:7AP/小时" value="R480F30"></el-option>
+                <el-option label="720P@30FPS 价格:7AP/小时" value="R720F30"></el-option>
+                <el-option
+                  label="720P@60FPS 价格:30AP/小时"
+                  value="R720F60"
+                ></el-option>
+                <el-option
+                  label="1080P@30FPS 价格:30AP/小时"
+                  value="R1080F30"
+                ></el-option>
+                <el-option
+                  label="*1080P@60FPS 价格:30AP/小时"
+                  value="R1080F60"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="推流设置" label-width="120px">            
               <el-checkbox v-model="accountInfo.joinAutoBalance">允许推流调配</el-checkbox>
               <el-checkbox v-model="accountInfo.postBiliDynamic">发送B站开播动态</el-checkbox>
               <el-checkbox v-model="accountInfo.autoRoomTitle">自动修改直播间标题</el-checkbox>
@@ -59,12 +81,34 @@
             <el-button type="primary" size="medium" @click="addAccount()">新 增</el-button>
         </span>
     </el-dialog>
-    <el-dialog title="修改账户设置" :visible.sync="editVisible" width="40%">
+    <el-dialog title="修改账户设置" :visible.sync="editVisible" width="680px">
         <el-form :model="account">
-            <el-form-item label="账号描述" label-width="140px">            
+            <el-form-item label="账号描述" label-width="120px">            
               <el-input v-model="account.description" autocomplete="off"></el-input>
             </el-form-item>
-            <el-form-item label="推流设置" label-width="140px">            
+            <el-form-item label="默认转播分辨率" label-width="120px">            
+              <el-select
+                size="small"
+                v-model="account.broadcastResolution"
+                placeholder="请选择转播分辨率"
+              >
+                <el-option label="480P@30FPS 价格:7AP/小时" value="R480F30"></el-option>
+                <el-option label="720P@30FPS 价格:7AP/小时" value="R720F30"></el-option>
+                <el-option
+                  label="720P@60FPS 价格:30AP/小时"
+                  value="R720F60"
+                ></el-option>
+                <el-option
+                  label="1080P@30FPS 价格:30AP/小时"
+                  value="R1080F30"
+                ></el-option>
+                <el-option
+                  label="*1080P@60FPS 价格:30AP/小时"
+                  value="R1080F60"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="推流设置" label-width="120px">            
               <el-checkbox v-model="account.joinAutoBalance">允许推流调配</el-checkbox>
               <el-checkbox v-model="account.postBiliDynamic">发送B站开播动态</el-checkbox>
               <el-checkbox v-model="account.autoRoomTitle">自动修改直播间标题</el-checkbox>

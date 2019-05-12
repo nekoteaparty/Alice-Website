@@ -105,10 +105,10 @@ export default {
       tableData: [],
       tableHeader: [
         { prop: "remark", label: "转播服务器标识" },
-        { prop: "address", label: "转播服务器地址", width: "460px" },
-        { prop: "performance", label: "性能指数" },
+        { prop: "address", label: "转播服务器地址", width: "200px" },
+        { prop: "performance", label: "性能指数", width: "100px"  },
         { prop: "videoId", label: "转播媒体编号" },
-        { prop: "videoTitle", label: "转播媒体名称" }
+        { prop: "videoTitle", label: "转播媒体名称" , width: "450px"}
       ],
       loading: false,
       editVisible: false,
