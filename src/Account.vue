@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-button v-if="!account.saved" type="primary" size="medium" icon="el-icon-plus" @click="accountInfo = { joinAutoBalance: false, postBiliDynamic: false, autoRoomTitle: false }, addVisible = true" :loading="loading">保存账户</el-button>
+    <el-button v-if="!account.saved" type="primary" size="medium" icon="el-icon-plus" @click="accountInfo = { joinAutoBalance: false, postBiliDynamic: false, autoRoomTitle: false, broadcastResolution: 'R720F30' }, addVisible = true" :loading="loading">保存账户</el-button>
     <el-button v-if="account.saved" size="medium" type="primary" icon="el-icon-edit" :loading="loading" @click="editVisible = true">账户设置</el-button>
     <el-popover v-if="account.saved" ref="removePopover" placement="bottom" width="200">
         <p><i class="el-icon-warning"></i> 账号删除后系统将中止正在进行的推流任务, 是否继续?</p>
@@ -11,6 +11,11 @@
     </el-popover>
     <hr/>
     <PagedTable :tableData="tableData" :tableHeader="tableHeader" :loading="loading">
+        <el-table-column label="AP点数" width="150px" v-if="account.admin">
+            <template slot-scope="scope">
+                {{scope.row.point}}
+            </template>
+        </el-table-column>
         <el-table-column label="允许推流调配" width="150px">
             <template slot-scope="scope">
                 <i class="el-icon-success" style="color:#67C23A" v-show="scope.row.joinAutoBalance"></i>
@@ -32,16 +37,38 @@
                     </div>
                     <el-button slot="reference" size="mini" type="danger">删除</el-button>
                 </el-popover>
-                <el-button slot="reference" size="mini" type="primary" @click="toggleVip(scope.row.accountId, scope.$index)">{{!scope.row.vip?'设为':'取消'}}VIP</el-button>
+                <el-button size="mini" type="primary" @click="billList(scope.row.accountId, scope.$index)">账单</el-button>
             </template>
         </el-table-column>
     </PagedTable>
-    <el-dialog title="保存推流账户" :visible.sync="addVisible" width="40%">
+    <el-dialog title="保存推流账户" :visible.sync="addVisible" width="680px">
         <el-form :model="accountInfo">
-            <el-form-item label="账号描述" label-width="140px">            
+            <el-form-item label="账号描述" label-width="120px">            
               <el-input v-model="accountInfo.description" autocomplete="off"></el-input>
             </el-form-item>
-            <el-form-item label="推流设置" label-width="140px">            
+            <el-form-item label="默认转播分辨率" label-width="120px">            
+              <el-select
+                size="small"
+                v-model="accountInfo.broadcastResolution"
+                placeholder="请选择转播分辨率"
+              >
+                <el-option label="480P@30FPS 价格:8AP/小时" value="R480F30"></el-option>
+                <el-option label="720P@30FPS 价格:8AP/小时" value="R720F30"></el-option>
+                <el-option
+                  label="720P@60FPS 价格:30AP/小时"
+                  value="R720F60"
+                ></el-option>
+                <el-option
+                  label="1080P@30FPS 价格:30AP/小时"
+                  value="R1080F30"
+                ></el-option>
+                <el-option
+                  label="*1080P@60FPS 价格:30AP/小时"
+                  value="R1080F60"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="推流设置" label-width="120px">            
               <el-checkbox v-model="accountInfo.joinAutoBalance">允许推流调配</el-checkbox>
               <el-checkbox v-model="accountInfo.postBiliDynamic">发送B站开播动态</el-checkbox>
               <el-checkbox v-model="accountInfo.autoRoomTitle">自动修改直播间标题</el-checkbox>
@@ -54,12 +81,34 @@
             <el-button type="primary" size="medium" @click="addAccount()">新 增</el-button>
         </span>
     </el-dialog>
-    <el-dialog title="修改账户设置" :visible.sync="editVisible" width="40%">
+    <el-dialog title="修改账户设置" :visible.sync="editVisible" width="680px">
         <el-form :model="account">
-            <el-form-item label="账号描述" label-width="140px">            
+            <el-form-item label="账号描述" label-width="120px">            
               <el-input v-model="account.description" autocomplete="off"></el-input>
             </el-form-item>
-            <el-form-item label="推流设置" label-width="140px">            
+            <el-form-item label="默认转播分辨率" label-width="120px">            
+              <el-select
+                size="small"
+                v-model="account.broadcastResolution"
+                placeholder="请选择转播分辨率"
+              >
+                <el-option label="480P@30FPS 价格:7AP/小时" value="R480F30"></el-option>
+                <el-option label="720P@30FPS 价格:7AP/小时" value="R720F30"></el-option>
+                <el-option
+                  label="720P@60FPS 价格:30AP/小时"
+                  value="R720F60"
+                ></el-option>
+                <el-option
+                  label="1080P@30FPS 价格:30AP/小时"
+                  value="R1080F30"
+                ></el-option>
+                <el-option
+                  label="*1080P@60FPS 价格:30AP/小时"
+                  value="R1080F60"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="推流设置" label-width="120px">            
               <el-checkbox v-model="account.joinAutoBalance">允许推流调配</el-checkbox>
               <el-checkbox v-model="account.postBiliDynamic">发送B站开播动态</el-checkbox>
               <el-checkbox v-model="account.autoRoomTitle">自动修改直播间标题</el-checkbox>
@@ -68,6 +117,10 @@
         <span slot="footer" class="dialog-footer">
             <el-button type="primary" size="medium" @click="editAccount()">保 存</el-button>
         </span>
+    </el-dialog>
+    <el-dialog :title="`${billAccountId}的账单`" :visible.sync="billListVisible">
+      <el-button size="mini" type="primary" @click="apPointChange(billAccountId)">AP点数变更</el-button>
+      <PagedTable :tableData="billTableData" :tableHeader="billTableHeader" :loading="loading"></PagedTable>
     </el-dialog>
   </div>
 </template>
@@ -102,6 +155,14 @@ export default {
         { prop: "description", label: "描述" }
       ],
       loading: false,
+      billTableData: [],
+      billTableHeader: [
+        { prop: "recordDate", label: "记录时间", width: "250px" },
+        { prop: "pointChange", label: "AP点数变动", width: "150px" },
+        { prop: "remark", label: "描述" }
+      ],
+      billListVisible: false,
+      billAccountId: '',
       detailVisible: false,
       editVisible: false,
       addVisible: false,
@@ -132,28 +193,32 @@ export default {
         }
       );
     },
-    toggleVip(accountId, index){
-       this.$http.post("/api/account/toggleVip.json?accountId=" + accountId).then(
-        function(response) {
-          // 这里是处理正确的回调
-          if (response.data.code === 0) {
-            this.$message({
-              message: "操作成功完成",
-              type: "success"
-            });
-            this.accountList();
-          } else {
-            this.$message.error(response.data.message);
+    apPointChange(accountId) {
+      this.$prompt('请输入要变更的AP点数', 'AP点数变更', {
+          inputType:'number'
+        }).then(({ value }) => {
+          this.loading = true;
+          this.$http.post("/api/account/apPointChange.json?accountId=" + accountId + "&point=" + value).then(
+          function(response) {
+            // 这里是处理正确的回调
+            if (response.data.code === 0) {
+              this.$alert(<p>操作成功！<br/>{response.data.data}</p>, "提示", {
+                type: "success"
+              });
+              this.billList(accountId);
+            } else {
+              this.$message.error(response.data.message);
+              this.loading = false;
+            }
+          },
+          function(response) {
+            if (response.status === 401) {
+              this.$router.push({ path: "/login" });
+            }
+            this.$message.error("请求失败");
             this.loading = false;
-          }
-        },
-        function(response) {
-          if (response.status === 401) {
-            this.$router.push({ path: "/login" });
-          }
-          this.$message.error("请求失败");
-          this.loading = false;
-        });
+          });
+        }).catch(() => {});
     },
     removeAccount(accountId, index) {
       let apiUrl = "/api/account/removeAccount.json?accountId=" + accountId;
@@ -227,6 +292,30 @@ export default {
         }
       );
     },
+    billList(accountId) {
+      this.loading = true;
+      this.billAccountId = accountId;
+      this.billListVisible = true;
+      this.$http.get("/api/account/billList.json?accountId=" + accountId).then(
+        function(response) {
+          // 这里是处理正确的回调
+          if (response.data.code === 0) {
+            this.billTableData = [];
+            this.billTableData = response.data.data;
+          } else {
+            this.$message.error(response.data.message);
+          }
+          this.loading = false;
+        },
+        function(response) {
+          if (response.status === 401) {
+            this.$router.push({ path: "/login" });
+          }
+          this.$message.error("请求失败");
+          this.loading = false;
+        }
+      );
+    },
     editAccount() {
       this.editVisible = false;
       this.loading = true;
@@ -254,6 +343,7 @@ export default {
           this.loading = false;
         }
       );
+      
     }
   },
   components: { PagedTable },
