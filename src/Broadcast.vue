@@ -6,48 +6,71 @@
       icon="el-icon-plus"
       @click="createTask"
       :loading="loading"
-    >手动推流</el-button>
+      >手动推流</el-button
+    >
     <a href="/api/onedrive/redirectRecord" target="_blank" style="float:right;">
-      <el-button type="primary" size="medium" icon="el-icon-document">查看录像</el-button>
+      <el-button type="primary" size="medium" icon="el-icon-document"
+        >查看录像</el-button
+      >
     </a>
-    <hr>
-    <PagedTable :tableData="tableData" :tableHeader="tableHeader" :loading="loading">
+    <hr />
+    <PagedTable
+      :tableData="tableData"
+      :tableHeader="tableHeader"
+      :loading="loading"
+    >
       <el-table-column label="推流健康度" width="106">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.health === 0" disable-transitions type="info">未知</el-tag>
+          <el-tag v-if="scope.row.health === 0" disable-transitions type="info"
+            >未知</el-tag
+          >
+          <el-tag v-if="scope.row.health === -1" disable-transitions type="info"
+            >初始化</el-tag
+          >
           <el-tag
             v-if="scope.row.health >= 98"
             disable-transitions
             type="success"
-          >优秀({{scope.row.health.toFixed(1)}})</el-tag>
+            >优秀({{ scope.row.health.toFixed(1) }})</el-tag
+          >
           <el-tag
             v-if="scope.row.health >= 93 && scope.row.health < 98"
             disable-transitions
             type="warning"
-          >一般({{scope.row.health.toFixed(1)}})</el-tag>
+            >一般({{ scope.row.health.toFixed(1) }})</el-tag
+          >
           <el-tag
             v-if="scope.row.health > 0 && scope.row.health < 93"
             disable-transitions
             type="danger"
-          >极差({{scope.row.health.toFixed(1)}})</el-tag>
+            >极差({{ scope.row.health.toFixed(1) }})</el-tag
+          >
         </template>
       </el-table-column>
       <el-table-column label="操作" width="200px">
         <template slot-scope="scope">
-          <el-button size="mini" @click="showDetail(scope.$index, scope.row)">详情</el-button>
+          <el-button size="mini" @click="showDetail(scope.$index, scope.row)"
+            >详情</el-button
+          >
           <el-button
             size="mini"
             style="margin-left: 0px;"
             type="primary"
-            @click="editVisible = true, editItem = scope.row, editItem.cropConf = {}"
-          >管理</el-button>
+            @click="
+              (editVisible = true),
+                (editItem = scope.row),
+                (editItem.cropConf = {})
+            "
+            >管理</el-button
+          >
           <el-button
             size="mini"
             style="margin-left: 0px;"
             type="success"
             @click="adoptTask(scope.row.videoId)"
             v-if="!!!scope.row.roomId"
-          >认领</el-button>
+            >认领</el-button
+          >
           <el-popover
             placement="bottom"
             width="200"
@@ -56,10 +79,16 @@
             v-if="!!scope.row.roomId"
           >
             <p>
-              <i class="el-icon-warning"></i> 停止后系统将不会重新推流, 是否继续?
+              <i class="el-icon-warning"></i> 停止后系统将不会重新推流,
+              是否继续?
             </p>
             <div style="text-align: right; margin-top:8px;">
-              <el-button type="primary" size="mini" @click="stopTask(scope.$index, scope.row)">继续</el-button>
+              <el-button
+                type="primary"
+                size="mini"
+                @click="stopTask(scope.$index, scope.row)"
+                >继续</el-button
+              >
             </div>
             <el-button
               slot="reference"
@@ -67,7 +96,8 @@
               type="danger"
               v-loading="loading"
               :disabled="loading"
-            >停止</el-button>
+              >停止</el-button
+            >
           </el-popover>
         </template>
       </el-table-column>
@@ -80,21 +110,26 @@
           :key="item.prop"
           label-width="80px"
         >
-          <el-input v-model="detailItem[`${item.prop}`]" autocomplete="off"></el-input>
+          <el-input
+            v-model="detailItem[`${item.prop}`]"
+            autocomplete="off"
+          ></el-input>
         </el-form-item>
         <el-form-item label="节目编号" label-width="80px">
           <el-input v-model="detailItem.videoId" autocomplete="off"></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" size="medium" @click="detailVisible = false">确 定</el-button>
+        <el-button type="primary" size="medium" @click="detailVisible = false"
+          >确 定</el-button
+        >
       </span>
     </el-dialog>
     <el-dialog
       title="推流管理"
       :visible.sync="editVisible"
       width="550px"
-      @close="editItem = {cropConf: {}}"
+      @close="editItem = { cropConf: {} }"
     >
       <el-form label-position="right" :model="editItem">
         <el-form-item label-width="50px">
@@ -104,8 +139,11 @@
             v-loading="loading"
             :disabled="loading"
             @click="getCropConf(editItem.videoId)"
-          >视频内容规制</el-button>
-          <el-checkbox style="margin-left:30px;" v-model="editItem.audioBanned">强制单声道</el-checkbox>
+            >视频内容规制</el-button
+          >
+          <el-checkbox style="margin-left:30px;" v-model="editItem.audioBanned"
+            >强制单声道</el-checkbox
+          >
           <el-checkbox v-model="editItem.vertical">竖屏直播</el-checkbox>
           <el-tag
             type="info"
@@ -113,16 +151,25 @@
             color="#fff"
             style="border:none"
             class="el-icon-info"
-          >修改以上设置将会导致推流短时间的中断</el-tag>
+            >修改以上设置将会导致推流短时间的中断</el-tag
+          >
         </el-form-item>
         <el-form-item label="直播分区" label-width="100px">
-          <area-selector v-model="editItem.area" :value="editItem.area"></area-selector>
+          <area-selector
+            v-model="editItem.area"
+            :value="editItem.area"
+          ></area-selector>
         </el-form-item>
         <el-form-item label="直播间标题" label-width="100px">
-          <el-input v-model="editItem.roomTitle" placeholder="[无需修改请留空]"></el-input>
+          <el-input
+            v-model="editItem.roomTitle"
+            placeholder="[无需修改请留空]"
+          ></el-input>
         </el-form-item>
         <el-form-item label="其他设置" label-width="100px">
-          <el-checkbox v-model="editItem.needRecord">直播后保存录像</el-checkbox>
+          <el-checkbox v-model="editItem.needRecord"
+            >直播后保存录像</el-checkbox
+          >
           <el-button
             v-if="account.admin"
             v-loading="loading"
@@ -131,11 +178,17 @@
             type="danger"
             size="small"
             @click="terminateTask(editItem.videoId)"
-          >终止推流任务</el-button>
+            >终止推流任务</el-button
+          >
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" size="medium" @click="editTask(), editVisible = false">修 改</el-button>
+        <el-button
+          type="primary"
+          size="medium"
+          @click="editTask(), (editVisible = false)"
+          >修 改</el-button
+        >
       </span>
     </el-dialog>
     <el-dialog
@@ -146,27 +199,62 @@
       @close="editItem.cropConf = {}"
     >
       <el-radio-group v-model="editItem.cropConf.videoBannedType">
-        <el-radio v-model="editItem.cropConf.videoBannedType" label="NONE">取消内容规制</el-radio>
-        <el-radio v-model="editItem.cropConf.videoBannedType" label="FULL_SCREEN">全屏</el-radio>
+        <el-radio v-model="editItem.cropConf.videoBannedType" label="NONE"
+          >取消内容规制</el-radio
+        >
+        <el-radio
+          v-model="editItem.cropConf.videoBannedType"
+          label="FULL_SCREEN"
+          >全屏</el-radio
+        >
         <el-radio
           v-model="editItem.cropConf.videoBannedType"
           label="CUSTOM_SCREEN"
-        >自定义</el-radio>
-        <el-checkbox style="margin-left:15px;" v-if="editItem.cropConf.videoBannedType == 'CUSTOM_SCREEN'" v-model="editItem.cropConf.autoBlur">自动评论区打码</el-checkbox>
-        <el-checkbox style="margin-left:15px;" v-if="editItem.cropConf.videoBannedType == 'CUSTOM_SCREEN'" v-model="editItem.cropConf.autoImageSegment">自动分离人物形象</el-checkbox>
+          >自定义</el-radio
+        >
       </el-radio-group>
-      <el-tag
-        v-if="!account.vip"
-        type="info"
-        disable-transitions
-        color="#fff"
-        style="border:none"
-        class="el-icon-info"
-      >&nbsp;如需自定义打码，请加QQ群936618172联系群主。</el-tag>
+      <el-checkbox
+        style="margin-left:15px;"
+        v-if="editItem.cropConf.videoBannedType == 'CUSTOM_SCREEN'"
+        v-model="editItem.cropConf.autoBlur"
+        >自动评论区打码</el-checkbox
+      >
+      <el-checkbox
+        style="margin-left:15px;"
+        v-if="editItem.cropConf.videoBannedType == 'CUSTOM_SCREEN'"
+        v-model="editItem.cropConf.autoImageSegment"
+        >自动分离人物形象</el-checkbox
+      >
+      <el-select
+        v-if="editItem.cropConf.videoBannedType == 'CUSTOM_SCREEN'"
+        style="margin-left:15px;width:240px"
+        size="small"
+        v-model="editItem.cropConf.broadcastResolution"
+        placeholder="请选择转播分辨率"
+      >
+        <el-option label="480P@30FPS 价格:7AP/小时" value="R480F30"></el-option>
+        <el-option label="720P@30FPS 价格:7AP/小时" value="R720F30"></el-option>
+        <el-option
+          label="720P@60FPS 价格:30AP/小时"
+          value="R720F60"
+        ></el-option>
+        <el-option
+          label="1080P@30FPS 价格:30AP/小时"
+          value="R1080F30"
+        ></el-option>
+        <el-option
+          label="*1080P@60FPS 价格:30AP/小时"
+          value="R1080F60"
+        ></el-option>
+      </el-select>
       <CustomLayout
         v-if="editItem.cropConf.videoBannedType == 'CUSTOM_SCREEN'"
         :cropConf="editItem.cropConf"
-        :backgroundImageSrc="`/api/keyframe/${editItem.videoId}?_t=${parseInt(new Date().getTime() / 100000)}`"
+        :backgroundImageSrc="
+          `/api/keyframe/${editItem.videoId}?_t=${parseInt(
+            new Date().getTime() / 100000
+          )}`
+        "
       ></CustomLayout>
       <span slot="footer" class="dialog-footer">
         <el-button
@@ -175,7 +263,8 @@
           @click="cropConfSave()"
           v-loading="loading"
           :disabled="loading"
-        >保 存</el-button>
+          >保 存</el-button
+        >
       </span>
     </el-dialog>
   </div>
@@ -273,9 +362,43 @@ export default {
       );
     },
     cropConfSave() {
+      if (!this.editItem.cropConf.broadcastResolution) {
+        this.$confirm("请选择转播分辨率", "提示", {
+          showCancelButton: false,
+          type: "error"
+        });
+        return;
+      } else if (this.editItem.cropConf.broadcastResolution == "R1080F60") {
+        this.$confirm(
+          <p>
+            您选择了1080P@60FPS转播分辨率，该分辨率下部分视频流无法达到流畅观看的性能要求，是否继续保存？
+            <br />
+            <b>
+              提示：使用自定义图片、矩形（圆角矩形）代替高斯模糊可以有效降低性能需求。
+            </b>
+          </p>,
+          "性能警告",
+          {
+            confirmButtonText: "继续",
+            cancelButtonText: "取消",
+            type: "warning"
+          }
+        )
+          .then(() => {
+            this.doCropConfSave();
+          })
+          .catch(() => {});
+      } else {
+        this.doCropConfSave();
+      }
+    },
+    doCropConfSave(confirm = false) {
       this.loading = true;
       let apiUrl =
-        "/api/broadcast/cropConfSave.json?videoId=" + this.editItem.videoId;
+        "/api/broadcast/cropConfSave.json?videoId=" +
+        this.editItem.videoId +
+        "&confirm=" +
+        confirm;
       if (this.editItem.cropConf.videoBannedType != "CUSTOM_SCREEN") {
         this.editItem.cropConf.layouts = new Array();
       }
@@ -292,12 +415,14 @@ export default {
           } else {
             this.$message.error(response.data.message);
           }
+          this.loading = false;
         },
         function(response) {
           if (response.status === 401) {
             this.$router.push({ path: "/login" });
           }
           this.$message.error("请求失败");
+          this.loading = false;
         }
       );
     },

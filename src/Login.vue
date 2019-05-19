@@ -76,11 +76,11 @@
 
 <style>
 img.alice {
-    position: fixed;
-    top: 60%;
-    left: 50%;
-    margin-left: -290px;
-    z-index: -1;
+  position: fixed;
+  top: 60%;
+  left: 50%;
+  margin-left: -290px;
+  z-index: -1;
 }
 
 .login-center {
@@ -99,18 +99,18 @@ img.alice {
   color: #409eff;
 }
 
-.input-userpwd > .el-input-group__append {
+.login-center .input-userpwd > .el-input-group__append {
   border: none;
   padding: 0;
   margin: 0;
   width: auto;
 }
 
-.input-userpwd > .el-input-group__prepend > * {
+.login-center .input-userpwd > .el-input-group__prepend > * {
   display: inline-block;
 }
 
-.label-username {
+.login-center .label-username {
   border-left: 1px solid #dcdfe6;
   margin: -10px 0 -10px 20px;
   padding-left: 20px;
@@ -118,24 +118,24 @@ img.alice {
   line-height: 40px;
 }
 
-.el-input-group__append .el-input-group__prepend {
+.login-center .el-input-group__append .el-input-group__prepend {
   border-left: none;
   border-radius: 0px;
 }
 
-.el-select .el-input {
+.login-center .el-select .el-input {
   width: 110px;
 }
 
-.el-dialog {
+.login-center .el-dialog {
   text-align: left;
 }
 
-.el-dialog__body {
+.login-center .el-dialog__body {
   padding: 10px 20px 15px 20px;
 }
 
-.captcha-prompt * {
+.login-center .captcha-prompt * {
   vertical-align: middle;
 }
 </style>
@@ -212,7 +212,7 @@ export default {
                   }
                 )
                   .then(({ value }) => {
-                    this.captcha = value;
+                    this.captcha = value.toUpperCase();
                     this.login();
                   })
                   .catch(() => {});
