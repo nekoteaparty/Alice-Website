@@ -15,8 +15,8 @@
       <!-- <a href="https://www.vultr.com/?ref=7654882" class="patron" target="_black" ><img src="./assets/vultr.png" height="54"></a> -->
       <el-progress v-for="(value, key) in account.billTimeMap" :key="key" type="circle" :width="54" :percentage="(60 - (account.timestamp - value) / (60 * 1000)) / 60 * 100" status="text">
         <span>
-          {{key}}AP<br/>
-          00:{{parseInt(60 - (account.timestamp - value) / (60 * 1000))}}
+          {{account.serverPoints[key]}}AP<br/>
+          00:{{(Array(2).join(0) + parseInt(60 - (account.timestamp - value) / (60 * 1000))).slice(-2)}}
         </span>
       </el-progress>
       <span>{{account.nickname}}</span>

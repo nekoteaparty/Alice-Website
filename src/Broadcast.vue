@@ -214,13 +214,13 @@
         >
       </el-radio-group>
       <el-checkbox
-        style="margin-left:15px;"
+        style="margin:0 0 0 15px;"
         v-if="editItem.cropConf.videoBannedType == 'CUSTOM_SCREEN'"
         v-model="editItem.cropConf.autoBlur"
         >自动评论区打码</el-checkbox
       >
       <el-checkbox
-        style="margin-left:15px;"
+        style="margin:0 0 0 15px;"
         v-if="editItem.cropConf.videoBannedType == 'CUSTOM_SCREEN'"
         v-model="editItem.cropConf.autoImageSegment"
         >自动分离人物形象</el-checkbox
@@ -232,18 +232,24 @@
         v-model="editItem.cropConf.broadcastResolution"
         placeholder="请选择转播分辨率"
       >
-        <el-option label="480P@30FPS 价格:8AP/小时" value="R480F30"></el-option>
-        <el-option label="720P@30FPS 价格:8AP/小时" value="R720F30"></el-option>
         <el-option
-          label="720P@60FPS 价格:30AP/小时"
+          :label="`480P@30FPS 价格:${account.serverPoints[1]}AP/小时`"
+          value="R480F30"
+        ></el-option>
+        <el-option
+          :label="`720P@30FPS 价格:${account.serverPoints[1]}AP/小时`"
+          value="R720F30"
+        ></el-option>
+        <el-option
+          :label="`720P@60FPS 价格:${account.serverPoints[2]}AP/小时`"
           value="R720F60"
         ></el-option>
         <el-option
-          label="1080P@30FPS 价格:30AP/小时"
+          :label="`1080P@30FPS 价格:${account.serverPoints[2]}AP/小时`"
           value="R1080F30"
         ></el-option>
         <el-option
-          label="*1080P@60FPS 价格:30AP/小时"
+          :label="`*1080P@60FPS 价格:${account.serverPoints[2]}AP/小时`"
           value="R1080F60"
         ></el-option>
       </el-select>

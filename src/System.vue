@@ -30,8 +30,11 @@
       <el-form-item label="系统安全秘钥">
         <el-input size="small" v-model="setting.encodeKey"></el-input>
         <span style="color:red;">
-          <i class="el-icon-warning"></i>警告:修改安全秘钥将会导致AP卡密失效！
+          <i class="el-icon-warning"></i>&nbsp;警告:修改安全秘钥将会导致AP卡密失效！
         </span>
+      </el-form-item>
+      <el-form-item label="服务器性能AP点数">
+        <el-input size="small" v-model="setting.serverPoints"></el-input>
       </el-form-item>
       <el-form-item label="AP点数店铺地址">
         <el-input size="small" v-model="setting.apShopUrl"></el-input>
@@ -98,6 +101,11 @@ export default {
   },
   methods: {
     saveSetting() {
+      if (this.setting.serverPoints) {
+        if (!(this.setting.serverPoints instanceof Array)) {
+          this.setting.serverPoints = this.setting.serverPoints.split(",");
+        }
+      }
       this.$http.post("/api/system/saveSetting.json", this.setting).then(
         function(response) {
           // 这里是处理正确的回调
