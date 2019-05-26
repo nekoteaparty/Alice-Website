@@ -5,9 +5,13 @@
       type="primary"
       size="medium"
       icon="el-icon-plus"
-      @click="channelInfo = { autoBalance: false, defaultCropConf: {}}, addVisible = true"
+      @click="
+        (channelInfo = { autoBalance: false, defaultCropConf: {} }),
+          (addVisible = true)
+      "
       :loading="loading"
-    >添加频道</el-button>
+      >添加频道</el-button
+    >
     <el-tag
       type="info"
       v-if="!account.admin"
@@ -19,7 +23,8 @@
       如需添加、删除频道请联系管理员，QQ群：
       <a
         href="tencent://groupwpa/?subcmd=all&param=7B2267726F757055696E223A3933363631383137322C2274696D655374616D70223A313534323934373835347D0A"
-      >936618172</a>
+        >936618172</a
+      >
     </el-tag>
     <el-input
       style="float:right;width:280px;"
@@ -28,7 +33,7 @@
       size="medium"
       clearable
     ></el-input>
-    <hr>
+    <hr />
     <PagedTable
       :tableData="tableData"
       :tableHeader="tableHeader"
@@ -37,7 +42,11 @@
     >
       <el-table-column label="允许推流调配" width="150px">
         <template slot-scope="scope">
-          <i class="el-icon-success" style="color:#67C23A" v-show="scope.row.autoBalance"></i>
+          <i
+            class="el-icon-success"
+            style="color:#67C23A"
+            v-show="scope.row.autoBalance"
+          ></i>
         </template>
       </el-table-column>
       <el-table-column label="操作" width="160px">
@@ -45,20 +54,33 @@
           <el-button
             type="primary"
             size="mini"
-            @click="channelInfo = JSON.parse(JSON.stringify(scope.row)), editVisible = true"
-          >编辑</el-button>
-          <el-popover placement="bottom" width="200" :ref="`popover-${scope.$index}`">
-            <p>
-              <i class="el-icon-warning"></i> 删除频道后无法恢复, 是否继续?
-            </p>
+            @click="
+              (channelInfo = JSON.parse(JSON.stringify(scope.row))),
+                (editVisible = true)
+            "
+            >编辑</el-button
+          >
+          <el-popover
+            placement="bottom"
+            width="200"
+            :ref="`popover-${scope.$index}`"
+          >
+            <p><i class="el-icon-warning"></i> 删除频道后无法恢复, 是否继续?</p>
             <div style="text-align: right; margin-top:8px;">
               <el-button
                 type="primary"
                 size="mini"
                 @click="removeChannel(scope.$index, scope.row)"
-              >继续</el-button>
+                >继续</el-button
+              >
             </div>
-            <el-button slot="reference" size="mini" type="danger" v-if="account.admin">删除</el-button>
+            <el-button
+              slot="reference"
+              size="mini"
+              type="danger"
+              v-if="account.admin"
+              >删除</el-button
+            >
           </el-popover>
         </template>
       </el-table-column>
@@ -71,31 +93,54 @@
           :key="item.prop"
           label-width="120px"
         >
-          <el-input v-model="channelInfo[`${item.prop}`]" autocomplete="off"></el-input>
+          <el-input
+            v-model="channelInfo[`${item.prop}`]"
+            autocomplete="off"
+          ></el-input>
         </el-form-item>
         <el-form-item label="默认开播分区" label-width="120px">
-          <area-selector v-model="channelInfo.defaultArea" :value="channelInfo.defaultArea"></area-selector>
+          <area-selector
+            v-model="channelInfo.defaultArea"
+            :value="channelInfo.defaultArea"
+          ></area-selector>
         </el-form-item>
         <el-form-item label="转播登录Cookie" label-width="120px">
-          <el-input v-model="channelInfo.cookies" autocomplete="off" placeholder="[如无需修改此项请留空]"></el-input>
+          <el-input
+            v-model="channelInfo.cookies"
+            autocomplete="off"
+            placeholder="[如无需修改此项请留空]"
+          ></el-input>
         </el-form-item>
         <el-form-item label="其他推流设置" label-width="120px">
-          <el-checkbox v-model="channelInfo.autoBalance">允许推流调配</el-checkbox>
-          <el-checkbox v-model="channelInfo.needRecord">自动开启录像</el-checkbox>
-          <el-checkbox v-model="channelInfo.defaultCropConf.autoBlur">自动评论区打码</el-checkbox>
-          <el-checkbox v-model="channelInfo.defaultCropConf.autoImageSegment">自动分离人物形象</el-checkbox>
+          <el-checkbox v-model="channelInfo.autoBalance"
+            >允许推流调配</el-checkbox
+          >
+          <el-checkbox v-model="channelInfo.needRecord"
+            >自动开启录像</el-checkbox
+          >
+          <el-checkbox v-model="channelInfo.defaultCropConf.autoBlur"
+            >自动评论区打码</el-checkbox
+          >
           <el-tooltip
             class="item"
             effect="dark"
-            content="请确保「默认推流账户」拥有爱丽丝区域打码服务的权限，否则此设置无效！"
+            content="请确保「默认推流账户」拥有足够的AP点数，否则此设置无效！"
             placement="top"
           >
             <i class="el-icon-warning"></i>
           </el-tooltip>
+          <el-checkbox v-model="channelInfo.defaultCropConf.autoImageSegment"
+            >自动分离人物形象</el-checkbox
+          >
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" size="medium" @click="editVisible = false, editChannel()">保 存</el-button>
+        <el-button
+          type="primary"
+          size="medium"
+          @click="(editVisible = false), editChannel()"
+          >保 存</el-button
+        >
       </span>
     </el-dialog>
     <el-dialog title="频道新增" :visible.sync="addVisible" width="40%">
@@ -106,7 +151,10 @@
           :key="item.prop"
           label-width="120px"
         >
-          <el-input v-model="channelInfo[`${item.prop}`]" autocomplete="off"></el-input>
+          <el-input
+            v-model="channelInfo[`${item.prop}`]"
+            autocomplete="off"
+          ></el-input>
         </el-form-item>
         <el-form-item label="默认开播分区" label-width="120px">
           <area-selector v-model="channelInfo.defaultArea"></area-selector>
@@ -119,22 +167,35 @@
           ></el-input>
         </el-form-item>
         <el-form-item label="其他推流设置" label-width="120px">
-          <el-checkbox v-model="channelInfo.autoBalance">允许推流调配</el-checkbox>
-          <el-checkbox v-model="channelInfo.needRecord">自动开启录像</el-checkbox>
-          <el-checkbox v-model="channelInfo.defaultCropConf.autoBlur">自动评论区打码</el-checkbox>
+          <el-checkbox v-model="channelInfo.autoBalance"
+            >允许推流调配</el-checkbox
+          >
+          <el-checkbox v-model="channelInfo.needRecord"
+            >自动开启录像</el-checkbox
+          >
+          <el-checkbox v-model="channelInfo.defaultCropConf.autoBlur"
+            >自动评论区打码</el-checkbox
+          >
           <el-tooltip
             class="item"
             effect="dark"
-            content="请确保「默认推流账户」拥有爱丽丝区域打码服务的权限，否则此设置无效！"
+            content="请确保「默认推流账户」拥有足够的AP点数，否则此设置无效！"
             placement="top"
           >
             <i class="el-icon-warning"></i>
           </el-tooltip>
-          <el-checkbox v-model="channelInfo.defaultCropConf.autoImageSegment">自动分离人物形象</el-checkbox>
+          <el-checkbox v-model="channelInfo.defaultCropConf.autoImageSegment"
+            >自动分离人物形象</el-checkbox
+          >
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" size="medium" @click="addVisible = false, addChannel()">新 增</el-button>
+        <el-button
+          type="primary"
+          size="medium"
+          @click="(addVisible = false), addChannel()"
+          >新 增</el-button
+        >
       </span>
     </el-dialog>
   </div>
