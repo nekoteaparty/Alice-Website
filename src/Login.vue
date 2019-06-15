@@ -21,9 +21,9 @@
         class="input-with-select"
         @keydown.enter.native="login"
       >
-        <el-select v-model="loginMode" slot="prepend" placeholder="请选择">
+        <el-select v-model="accountSite" slot="prepend" placeholder="请选择">
           <el-option
-            v-for="item in loginModes"
+            v-for="item in accountSites"
             :key="item.value"
             :value="item.value"
             :label="item.label"
@@ -38,9 +38,9 @@
       class="input-with-select input-userpwd"
       @keydown.enter.native="login"
     >
-      <el-select v-model="loginMode" slot="prepend" placeholder="请选择">
+      <el-select v-model="accountSite" slot="prepend" placeholder="请选择">
         <el-option
-          v-for="item in loginModes"
+          v-for="item in accountSites"
           :key="item.value"
           :value="item.value"
           :label="item.label"
@@ -150,6 +150,10 @@ export default {
       loginModes: [
         { label: "账户/密码", value: "userpwd" },
         { label: "Cookies", value: "cookies" }
+      ],
+      accountSites: [
+        { label: "哔哩哔哩", value: "bilibili" },
+        { label: "17Live", value: "17live" }
       ],
       showCookiesTip: false,
       cookies: undefined,
