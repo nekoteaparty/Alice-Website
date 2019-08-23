@@ -36,7 +36,7 @@
       v-model="username"
       class="input-with-select input-userpwd"
     >
-      <el-select v-model="accountSite" slot="prepend" placeholder="请选择">
+      <el-select v-model="accountSite" slot="prepend" placeholder="请选择" @change="accountSiteChange">
         <el-option
           v-for="item in accountSites"
           :key="item.value"
@@ -135,8 +135,16 @@ img.alice {
   padding: 10px 20px 15px 20px;
 }
 
-.login-center .captcha-prompt * {
+.captcha-prompt * {
   vertical-align: middle;
+}
+
+.captcha-prompt img {
+  image-rendering: -moz-crisp-edges; /* Firefox */
+  image-rendering: -o-crisp-edges; /* Opera */
+  image-rendering: -webkit-optimize-contrast; /* Webkit (non-standard naming) */
+  image-rendering: pixelated;
+  -ms-interpolation-mode: nearest-neighbor; /* IE (non-standard property) */
 }
 </style>
 
@@ -151,6 +159,7 @@ export default {
       ],
       accountSites: [
         { label: "哔哩哔哩", value: "bilibili" },
+        { label: "斗鱼TV", value: "douyu", qrCode: true },
         { label: "17Live", value: "17live" }
       ],
       showCookiesTip: false,
@@ -165,6 +174,38 @@ export default {
     };
   },
   methods: {
+    accountSiteChange(value) {
+      let item = {};
+      item = this.accountSites.find((item)=>{
+          return item.value === value;
+      });
+      if (item.qrCode) {
+        this.$confirm(
+          <p class="captcha-prompt">
+            <span>请使用{item.label}客户端扫描二维码登录</span>
+            <img
+              height="164"
+              src={
+                "/api/login/getCaptcha?accountSite=" +
+                this.accountSite +
+                "&_t=" +
+                new Date().getTime()
+              }
+            />
+          </p>,
+          "安全验证",
+          {
+            center: true,
+            confirmButtonText: "我已扫码",
+            cancelButtonText: "取消"
+          }
+        )
+          .then(() => {
+            this.login();
+            this.accountSite = 'bilibili';
+          }).catch(() => {this.accountSite = 'bilibili'});
+      }
+    },
     reloadGif(e) {
       let img = e.target;
       let src = img.src;
