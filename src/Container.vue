@@ -31,7 +31,7 @@
         <a href="javascript:" @click="billList">账单</a>
       </span>
       &nbsp;&nbsp;
-      <a href="javascript:" title="登出" @click="logout" style="color:#333;">
+      <a href="javascript:" title="登出" @click="logout" style="color:#333;" v-loading.fullscreen.lock="logoutLoading" element-loading-text="さようなら~">
         <svg class="svg-icon" viewBox="0 0 512 512" version="1.1" width="16" height="16" aria-hidden="true">
           <path
             fill="currentColor"
@@ -267,12 +267,14 @@ export default {
       ],
       billListVisible: false,
       loading: false,
+      logoutLoading: false,
       breadcrumb: "",
       cards: ""
     };
   },
   methods: {
     logout() {
+      this.logoutLoading = true
       this.$http.get("/api/login/logout.json").then(
         function(response) {
           // 这里是处理正确的回调

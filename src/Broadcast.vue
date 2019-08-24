@@ -28,9 +28,14 @@
             >初始化</el-tag
           >
           <el-tag
-            v-if="scope.row.health >= 98"
+            v-if="scope.row.health == 100"
             disable-transitions
             type="success"
+            >完美({{ scope.row.health.toFixed(1) }})</el-tag
+          >
+          <el-tag
+            v-if="scope.row.health >= 98 && scope.row.health < 100"
+            disable-transitions
             >优秀({{ scope.row.health.toFixed(1) }})</el-tag
           >
           <el-tag
