@@ -60,6 +60,9 @@
       </template>
       <template v-if="activatedLayout.type == 'ShapeLayout'">
         <div style="display:inline-block;">
+          <el-checkbox label="遮罩层" v-model="activatedLayout.mask"></el-checkbox>
+         </div>
+        <div style="display:inline-block;">
           <el-color-picker
             v-model="activatedLayout.rgba"
             size="small"
@@ -75,7 +78,7 @@
             :max="100"
             :step="5"
             :format-tooltip="(value) => value + '%'"
-            style="width:120px;display:inline-block;vertical-align: middle;margin-left:10px;"
+            style="width:90px;display:inline-block;vertical-align: middle;margin-left:10px;"
           ></el-slider>
         </div>
         <div style="display:inline-block;margin-right:10px;">
@@ -86,7 +89,7 @@
             :max="100"
             :step="5"
             :format-tooltip="(value) => value + '%'"
-            style="width:120px;display:inline-block;vertical-align: middle;margin-left:10px;"
+            style="width:90px;display:inline-block;vertical-align: middle;margin-left:10px;"
           ></el-slider>
         </div>
       </template>
@@ -144,8 +147,12 @@
           :style="`background:none;border:none;width:100%;height:100%;opacity:${layout.opacity}`"
         >
         <div
-          v-if="layout.type == 'ShapeLayout'"
+          v-if="layout.type == 'ShapeLayout' && !layout.mask"
           :style="`width:100%;height:100%;opacity:${layout.opacity};background-color:${layout.hexColor};border-radius:${layout.radiusPercentW / 2}% / ${layout.radiusPercentH / 2}%;`"
+        ></div>
+        <div
+          v-if="layout.type == 'ShapeLayout' && layout.mask"
+          :style="`width:100%;height:100%;background-image:url('${backgroundImageSrc}');background-position:${0-layout.x}px ${0-layout.y}px;filter: blur(${cropConf.blurSize}px);border-radius:${layout.radiusPercentW / 2}% / ${layout.radiusPercentH / 2}%;`"
         ></div>
         <div
           v-if="layout.type == 'RectangleBlurLayout'"
