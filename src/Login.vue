@@ -19,6 +19,7 @@
         placeholder="请输入Cookies"
         v-model="cookies"
         class="input-with-select"
+        @keydown.enter.native="login"
       >
         <el-select v-model="accountSite" slot="prepend" placeholder="请选择">
           <el-option
@@ -35,6 +36,7 @@
       v-if="loginMode === 'userpwd'"
       v-model="username"
       class="input-with-select input-userpwd"
+      @keydown.enter.native="login"
     >
       <el-select v-model="accountSite" slot="prepend" placeholder="请选择" @change="accountSiteChange">
         <el-option
