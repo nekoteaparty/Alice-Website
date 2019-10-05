@@ -365,6 +365,7 @@ export default {
   created() {
     window.clearInterval(window.interval);
     let $ = this;
+    let isShowingErrorTip = false;
     window.interval = setInterval(function() {
       $.$http.get("/api/account/info.json").then(
         function(response) {
@@ -375,6 +376,44 @@ export default {
               JSON.stringify(response.data.data)
             );
             this.account = response.data.data;
+            if(this.account.broadcastError) {
+              let showErrorTip = false;
+              let lastError = localStorage.getItem("lastError");
+              if(lastError != null) {
+                try {
+                  lastError = JSON.parse(lastError);
+                } catch(e) {
+                  lastError = {};
+                }
+                if(!lastError.isRead || lastError.errTime != this.account.broadcastError.errTime) {
+                  showErrorTip = true;
+                }
+              } else {
+                showErrorTip = true;
+              }
+              if(showErrorTip && !isShowingErrorTip) {
+                lastError = this.account.broadcastError;
+                localStorage.setItem("lastError", JSON.stringify(lastError));
+                isShowingErrorTip = true;
+                this.$alert(
+                  <div>
+                    您的转播任务因为以下原因，已于{lastError.errTime}(GMT+8)停止:
+                    <br/>
+                    {lastError.errMsg.substring(0, 200)}
+                  </div>, 
+                  "系统通知", 
+                  {
+                    showClose: false,
+                    showCancelButton: false,
+                    type: "info"
+                  }
+                ).then(() => {
+                  isShowingErrorTip = false;
+                  lastError.isRead = true;
+                  localStorage.setItem("lastError", JSON.stringify(lastError));
+                });
+              }
+            }
           } else {
             this.$message.error(response.data.message);
           }
