@@ -53,10 +53,18 @@
         >删除账户</el-button
       >
     </el-popover>
+    <el-input
+      style="float:right;width:280px;"
+      placeholder="请输入筛选条件"
+      v-model="filter"
+      size="medium"
+      clearable
+    ></el-input>
     <hr />
     <PagedTable
       :tableData="tableData"
       :tableHeader="tableHeader"
+      :filter="filter"
       :loading="loading"
     >
       <el-table-column label="AP点数" width="150px" v-if="account.admin">
@@ -309,7 +317,8 @@ export default {
       editVisible: false,
       addVisible: false,
       agree: false,
-      accountInfo: {}
+      accountInfo: {},
+      filter: ""
     };
   },
   methods: {
