@@ -43,8 +43,13 @@ export default {
       this.filterTableData = [];
       if (this.filter) {
         this.tableData.forEach(element => {
-          if (element && (element.channelName.indexOf(this.filter) > -1 || element.channelUrl.indexOf(this.filter) > -1)) {
-            this.filterTableData.push(element);
+          if (element) {
+            for (let property in element) {
+              if (element[property] && element[property].indexOf && element[property].indexOf(this.filter) > -1) {
+                this.filterTableData.push(element);
+                break;
+              }
+            }
           }
         });
       } else {
