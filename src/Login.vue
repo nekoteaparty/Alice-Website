@@ -10,7 +10,10 @@
     >
       <template>
         不知道如何获取Cookies？
-        <a href="javascript:" @click="showCookiesTip=true">请点击此处</a>
+        <a
+          href="javascript:"
+          @click="showCookiesTip=true"
+        >请点击此处</a>
       </template>
       <el-input
         slot="reference"
@@ -21,7 +24,11 @@
         class="input-with-select"
         @keydown.enter.native="login"
       >
-        <el-select v-model="accountSite" slot="prepend" placeholder="请选择">
+        <el-select
+          v-model="accountSite"
+          slot="prepend"
+          placeholder="请选择"
+        >
           <el-option
             v-for="item in accountSites"
             :key="item.value"
@@ -29,7 +36,11 @@
             :label="item.label"
           ></el-option>
         </el-select>
-        <el-button type="primary" slot="append" @click="login">登录</el-button>
+        <el-button
+          type="primary"
+          slot="append"
+          @click="login"
+        >登录</el-button>
       </el-input>
     </el-popover>
     <el-input
@@ -38,7 +49,12 @@
       class="input-with-select input-userpwd"
       @keydown.enter.native="login"
     >
-      <el-select v-model="accountSite" slot="prepend" placeholder="请选择" @change="accountSiteChange">
+      <el-select
+        v-model="accountSite"
+        slot="prepend"
+        placeholder="请选择"
+        @change="accountSiteChange"
+      >
         <el-option
           v-for="item in accountSites"
           :key="item.value"
@@ -46,8 +62,15 @@
           :label="item.label"
         ></el-option>
       </el-select>
-      <span class="label-username" slot="prepend">用户名</span>
-      <el-input type="password" v-model="password" slot="append">
+      <span
+        class="label-username"
+        slot="prepend"
+      >用户名</span>
+      <el-input
+        type="password"
+        v-model="password"
+        slot="append"
+      >
         <template slot="prepend">密&nbsp;&nbsp;码</template>
         <el-button
           type="primary"
@@ -64,15 +87,33 @@
       style="border:none"
       class="el-icon-info"
     >&nbsp;除非您明确手动操作保存Cookie，否则爱丽丝不会主动记录您的Cookie及其他个人信息，退出登录所有信息都将自动删除。</el-tag>
-    <el-dialog title="如何获取Cookies" :visible.sync="showCookiesTip" width="850px" top="5vh">
+    <el-dialog
+      title="如何获取Cookies"
+      :visible.sync="showCookiesTip"
+      width="850px"
+      top="5vh"
+    >
       <p>请确保你已经登录{{accountSiteLabel}}，然后打开一个标签页，按F12打开工具栏，切换到[NETWORK]标签，打开任意一个{{accountSiteLabel}}页面，点开请求列表的第一条记录，在右侧详情中提取Request Header的Cookie字符串，然后将所有内容复制到输入框中即可。</p>
       <p>你也可以参考下方的GIF动画进行操作：</p>
-      <img src="./assets/step.gif" title="点击重新播放" @click="reloadGif">
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="showCookiesTip=false">确 定</el-button>
+      <img
+        src="./assets/step.gif"
+        title="点击重新播放"
+        @click="reloadGif"
+      >
+      <span
+        slot="footer"
+        class="dialog-footer"
+      >
+        <el-button
+          type="primary"
+          @click="showCookiesTip=false"
+        >确 定</el-button>
       </span>
     </el-dialog>
-    <img class="alice" src="./assets/alice_half_body.jpg">
+    <img
+      class="alice"
+      src="./assets/alice_half_body.jpg"
+    >
   </div>
 </template>
 
@@ -178,8 +219,8 @@ export default {
   methods: {
     accountSiteChange(value) {
       let item = {};
-      item = this.accountSites.find((item)=>{
-          return item.value === value;
+      item = this.accountSites.find(item => {
+        return item.value === value;
       });
       if (item.qrCode) {
         this.$confirm(
@@ -204,8 +245,11 @@ export default {
         )
           .then(() => {
             this.login();
-            this.accountSite = 'bilibili';
-          }).catch(() => {this.accountSite = 'bilibili'});
+            this.accountSite = "bilibili";
+          })
+          .catch(() => {
+            this.accountSite = "bilibili";
+          });
       }
     },
     reloadGif(e) {
@@ -229,40 +273,24 @@ export default {
             this.loading = false;
             // 这里是处理正确的回调
             if (response.data.code === 0) {
-              sessionStorage.setItem(
-                "account",
-                JSON.stringify(response.data.data)
-              );
-              this.$router.push({ path: "/main/broadcast" });
+              sessionStorage.setItem("account", JSON.stringify(response.data.data));
+              location.href = "/main/broadcast";
             } else {
               if (response.data.code === -101) {
-                this.$prompt(
-                  <p class="captcha-prompt">
-                    <span>请输入验证码</span>
-                    <img
-                      height="50"
-                      alt="验证码图像"
-                      src={
-                        "/api/login/getCaptcha?accountSite=" +
-                        this.accountSite +
-                        "&_t=" +
-                        new Date().getTime()
-                      }
-                    />
-                  </p>,
-                  "安全验证",
-                  {
-                    confirmButtonText: "确定",
-                    cancelButtonText: "取消",
-                    inputPattern: /.+/,
-                    inputErrorMessage: "请输入验证码"
-                  }
+                var that = this;
+                this.$alert(
+                  <iframe
+                    src={response.data.data}
+                    style="width:100%;height:320px;border:none;"
+                  ></iframe>,
+                  "安全验证"
                 )
-                  .then(({ value }) => {
-                    this.captcha = value.toUpperCase();
-                    this.login();
-                  })
+                  .then(() => {})
                   .catch(() => {});
+                window.loginWithGeeVerify = function(gcData) {
+                  that.captcha = JSON.stringify(gcData);
+                  that.login();
+                };
               }
               this.$message.error(response.data.message);
             }
