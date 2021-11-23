@@ -201,7 +201,7 @@ export default {
         { label: "Cookies", value: "cookies" }
       ],
       accountSites: [
-        { label: "哔哩哔哩", value: "bilibili" },
+        { label: "哔哩哔哩", value: "bilibili", qrCode: true},
         { label: "斗鱼TV", value: "douyu", qrCode: true },
         { label: "17Live", value: "17live" }
       ],
